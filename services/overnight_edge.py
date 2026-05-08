@@ -5,12 +5,11 @@ import urllib.request
 from datetime import datetime, timezone
 import sys
 
-sys.path.insert(0, '/mnt/user/overnight-edge/services')
-from cartoon_gen import generate_cartoon
-
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
+
+LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
 
 def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -24,6 +23,7 @@ def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
         return False
 
 def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHANNEL):
+    """Send photo with caption to Telegram"""
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
     
     boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
@@ -49,7 +49,7 @@ def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHA
     
     body.append(f"--{boundary}".encode())
     body.append(f'Content-Disposition: form-data; name="photo"; filename="{os.path.basename(photo_path)}"'.encode())
-    body.append(b"Content-Type: image/png")
+    body.append(b"Content-Type: image/jpeg")
     body.append(b"")
     body.append(photo_data)
     
@@ -162,15 +162,11 @@ def main():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
     
-    # Generate cartoon mascot for daily brief
-    cartoon_text = f"Market open soon! S&P {data['sp_futures']}, VIX at {data['vix']}. Top gainer: {data['gainers'][0]['ticker']}!"
-    cartoon_path = generate_cartoon("generic", cartoon_text, f"/mnt/user/overnight-edge/cartoons/brief_{date_str}.png")
-    
-    # 1. Post FREE PREVIEW to public channel with cartoon
+    # 1. Post FREE PREVIEW to public channel with dark logo
     preview = generate_free_preview(data)
-    preview_sent = send_telegram_photo(cartoon_path, preview, PUBLIC_CHANNEL)
+    preview_sent = send_telegram_photo(LOGO_PATH, preview, PUBLIC_CHANNEL)
     log_delivery(date_str, "public", "preview", 1, "delivered" if preview_sent else "failed")
-    print(f"Free preview with cartoon sent to public channel: {'OK' if preview_sent else 'FAIL'}")
+    print(f"Free preview with dark logo sent to public channel: {'OK' if preview_sent else 'FAIL'}")
     
     # 2. Post FULL BRIEF to admin
     full_brief = generate_full_brief(data)

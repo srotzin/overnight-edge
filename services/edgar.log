@@ -8,3 +8,192 @@ Congressional trades error: HTTP Error 403: Forbidden
 Fetching EDGAR Form 4 filings...
 Fetching EDGAR 8-K filings...
 Scan complete at 2026-05-08 06:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 06:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 06:15
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 06:30
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 06:30
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 06:45
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 06:45
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 07:00
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 07:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 07:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 07:15
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 07:30
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 07:30
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 07:45
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 07:45
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 08:00
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 08:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 08:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 08:15
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 08:30
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 08:30
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 08:45
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 08:45
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 09:00
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 09:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 09:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 09:15
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 09:30
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 09:30
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 09:45
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 09:45
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 10:00
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 10:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 10:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 10:15
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 10:30
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 10:30
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 10:45
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 10:45
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 11:00
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 11:00
+/mnt/user/overnight-edge/services/edgar_monitor.py:107: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'updated': updated.text if updated else '',
+/mnt/user/overnight-edge/services/edgar_monitor.py:108: DeprecationWarning: Testing an element's truth value will raise an exception in future versions.  Use specific 'len(elem)' or 'elem is not None' test instead.
+  'link': link.get('href') if link else '',
+Starting EDGAR/Congressional scan at 2026-05-08 11:15
+Fetching congressional trades...
+Congressional trades error: HTTP Error 403: Forbidden
+Fetching EDGAR Form 4 filings...
+Scan complete at 2026-05-08 11:15

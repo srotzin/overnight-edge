@@ -7,13 +7,11 @@ from datetime import datetime, timezone, timedelta
 import time
 import sys
 
-# Add services directory to path
-sys.path.insert(0, '/mnt/user/overnight-edge/services')
-from cartoon_gen import generate_cartoon
-
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
+
+LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
 
 EDGAR_RSS = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=4&company=&dateb=&owner=only&start=0&count=100&output=atom"
 EDGAR_8K_RSS = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&company=&dateb=&owner=include&start=0&count=40&output=atom"
@@ -40,7 +38,6 @@ def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHA
     
     boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
     
-    # Build multipart form data
     with open(photo_path, "rb") as f:
         photo_data = f.read()
     
@@ -62,7 +59,7 @@ def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHA
     
     body.append(f"--{boundary}".encode())
     body.append(f'Content-Disposition: form-data; name="photo"; filename="{os.path.basename(photo_path)}"'.encode())
-    body.append(b"Content-Type: image/png")
+    body.append(b"Content-Type: image/jpeg")
     body.append(b"")
     body.append(photo_data)
     
@@ -149,42 +146,12 @@ def fetch_congressional_trades():
     return trades
 
 def send_congressional_alert(trade, is_public=True):
-    """Send congressional trade alert with cartoon"""
+    """Send congressional trade alert with dark logo"""
     ticker = trade['ticker']
     rep = trade['representative']
     action = trade['transaction']
     amount = trade['amount']
     date = trade['date']
-    
-    # Determine politician for cartoon
-    politician = "generic"
-    rep_lower = rep.lower()
-    if any(n in rep_lower for n in ['pelosi', 'nancy']):
-        politician = "Nancy Pelosi"
-    elif any(n in rep_lower for n in ['trump', 'donald']):
-        politician = "Donald Trump"
-    elif any(n in rep_lower for n in ['graham', 'lindsey']):
-        politician = "Lindsey Graham"
-    elif any(n in rep_lower for n in ['gates', 'bill']):
-        politician = "Bill Gates"
-    elif any(n in rep_lower for n in ['biden', 'joe']):
-        politician = "Joe Biden"
-    elif any(n in rep_lower for n in ['harris', 'kamala']):
-        politician = "Kamala Harris"
-    elif any(n in rep_lower for n in ['mcconnell', 'mitch']):
-        politician = "Mitch McConnell"
-    elif any(n in rep_lower for n in ['schumer', 'chuck']):
-        politician = "Chuck Schumer"
-    elif any(n in rep_lower for n in ['mcCarthy', 'kevin']):
-        politician = "Kevin McCarthy"
-    elif any(n in rep_lower for n in ['warren', 'elizabeth']):
-        politician = "Elizabeth Warren"
-    elif any(n in rep_lower for n in ['soros', 'george']):
-        politician = "George Soros"
-    
-    # Generate cartoon
-    cartoon_text = f"{action} {amount} of {ticker}! Filed {date}."
-    cartoon_path = generate_cartoon(politician, cartoon_text, f"/mnt/user/overnight-edge/cartoons/alert_{ticker}_{datetime.now().strftime('%H%M%S')}.png")
     
     # Score
     score = 3
@@ -194,7 +161,7 @@ def send_congressional_alert(trade, is_public=True):
         score = 5
     
     if is_public:
-        # Public teaser with cartoon
+        # Public teaser with logo
         caption = f"""🚨 <b>CONGRESSIONAL TRADE ALERT</b>
 ━━━━━━━━━━━━━━━━━━━━
 👤 <b>{rep}</b>
@@ -206,8 +173,8 @@ def send_congressional_alert(trade, is_public=True):
 Full analysis + confluence scoring →
 https://overnight-edge.onrender.com"""
         
-        sent = send_telegram_photo(cartoon_path, caption, PUBLIC_CHANNEL)
-        print(f"Public cartoon alert for {ticker}: {'OK' if sent else 'FAIL'}")
+        sent = send_telegram_photo(LOGO_PATH, caption, PUBLIC_CHANNEL)
+        print(f"Public alert for {ticker}: {'OK' if sent else 'FAIL'}")
     else:
         # Full alert for paid subscribers
         caption = f"""🚨 <b>SIGNALSYNTHESIZER — {ticker}</b>
@@ -220,18 +187,18 @@ https://overnight-edge.onrender.com"""
 ⏰ <b>TIME:</b> {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC
 ⚠️ NOT FINANCIAL ADVICE"""
         
-        sent = send_telegram_photo(cartoon_path, caption, ADMIN_CHAT)
+        sent = send_telegram_photo(LOGO_PATH, caption, ADMIN_CHAT)
         log_signal(
             datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
             ticker, 'congressional', score,
             'STOCK Act', 'House records', '',
             'delivered' if sent else 'failed'
         )
-        print(f"Full cartoon alert for {ticker}: {'OK' if sent else 'FAIL'}")
+        print(f"Full alert for {ticker}: {'OK' if sent else 'FAIL'}")
 
 def main():
     now = datetime.now(timezone.utc)
-    date_str = now.strftime("%Y-%m-%d %H:%M")
+    date_str = now.strftime('%Y-%m-%d %H:%M')
     
     print(f"Starting EDGAR/Congressional scan at {date_str}")
     
@@ -250,17 +217,12 @@ def main():
     form4 = fetch_edgar_form4()
     
     for filing in form4[:5]:
-        # Basic insider filing alert
         title = filing['title']
         import re
         match = re.search(r'4 - ([A-Z]+) - (.+?) \(', title)
         if match:
             ticker = match.group(1)
             insider = match.group(2)
-            
-            # Generate generic cartoon
-            cartoon_text = f"Filed Form 4 for {ticker}. Insider: {insider}."
-            cartoon_path = generate_cartoon("generic", cartoon_text, f"/mnt/user/overnight-edge/cartoons/insider_{ticker}_{datetime.now().strftime('%H%M%S')}.png")
             
             caption = f"""📋 <b>INSIDER FILING — {ticker}</b>
 ━━━━━━━━━━━━━━━━━━━━
@@ -271,7 +233,7 @@ def main():
 Full analysis + options flow →
 https://overnight-edge.onrender.com"""
             
-            send_telegram_photo(cartoon_path, caption, PUBLIC_CHANNEL)
+            send_telegram_photo(LOGO_PATH, caption, PUBLIC_CHANNEL)
             time.sleep(3)
     
     print(f"Scan complete at {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}")
