@@ -6,7 +6,7 @@ import json
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
-LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
+LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_bot.png"
 
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -22,7 +22,6 @@ def send_telegram(text):
 def send_telegram_photo(photo_path, caption):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
     boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-    import base64
     with open(photo_path, "rb") as f:
         photo_data = f.read()
     body = []
@@ -40,7 +39,7 @@ def send_telegram_photo(photo_path, caption):
     body.append(b"HTML")
     body.append(f"--{boundary}".encode())
     body.append(f'Content-Disposition: form-data; name="photo"; filename="{os.path.basename(photo_path)}"'.encode())
-    body.append(b"Content-Type: image/jpeg")
+    body.append(b"Content-Type: image/png")
     body.append(b"")
     body.append(photo_data)
     body.append(f"--{boundary}--".encode())
@@ -54,7 +53,7 @@ def send_telegram_photo(photo_path, caption):
         return False
 
 def count_subscribers():
-    tiers = {"digest": 0, "signal": 0, "x10": 0, "x20": 0, "pulse-core": 0, "pulse-pro": 0}
+    tiers = {"digest": 0, "signal": 0, "squeeze": 0, "x10": 0, "x20": 0, "pulse-core": 0, "pulse-pro": 0, "sunday": 0}
     cancelled = 0
     try:
         with open("/mnt/user/overnight-edge/subscribers.csv", "r") as f:
@@ -65,6 +64,11 @@ def count_subscribers():
                     tiers[tier] += 1
                 elif status == "cancelled":
                     cancelled += 1
+                # Count addons
+                if row.get("squeeze") == "active":
+                    tiers["squeeze"] += 1
+                if row.get("sunday") == "active":
+                    tiers["sunday"] += 1
     except:
         pass
     return tiers, cancelled
@@ -111,6 +115,20 @@ def count_predictions():
         pass
     return total, divergences
 
+def count_squeezes():
+    total = 0
+    high_score = 0
+    try:
+        with open("/mnt/user/overnight-edge/squeeze_log.csv", "r") as f:
+            for row in csv.DictReader(f):
+                total += 1
+                score = int(row.get("squeeze_score", 0) or 0)
+                if score >= 8:
+                    high_score += 1
+    except:
+        pass
+    return total, high_score
+
 def count_deliveries():
     total_briefs = 0
     total_alerts = 0
@@ -138,15 +156,18 @@ def main():
     score_counts, signal_total = count_signals()
     x_total, x_top = count_xsignals()
     pred_total, pred_div = count_predictions()
+    sq_total, sq_high = count_squeezes()
     briefs, alerts, failed = count_deliveries()
     
     mrr = (
         tiers["digest"] * 49 +
         tiers["signal"] * 149 +
+        tiers["squeeze"] * 99 +
         tiers["x10"] * 249 +
         tiers["x20"] * 449 +
         tiers["pulse-core"] * 299 +
-        tiers["pulse-pro"] * 499
+        tiers["pulse-pro"] * 499 +
+        tiers["sunday"] * 29
     )
     
     x_top_text = "\n".join([f"• @{a}: {c} alerts" for a, c in x_top]) if x_top else "• No XSignal data yet"
@@ -157,10 +178,12 @@ def main():
 <b>SUBSCRIBERS:</b>
 • Daily Digest ($49): {tiers['digest']}
 • Signal ($149): {tiers['signal']}
+• Squeeze Radar ($99): {tiers['squeeze']}
 • X10 ($249): {tiers['x10']}
 • X20 ($449): {tiers['x20']}
 • PredictionCore ($299): {tiers['pulse-core']}
 • Prediction Pro ($499): {tiers['pulse-pro']}
+• Sunday Setup ($29): {tiers['sunday']}
 • Cancelled: {cancelled}
 • <b>Total MRR: ${mrr}/mo</b>
 
@@ -174,6 +197,10 @@ def main():
 • Total Alerts: {x_total}
 • Top Accounts:
 {x_top_text}
+
+<b>SHORT SQUEEZE RADAR:</b>
+• Total Scans: {sq_total}
+• High Score (8+): {sq_high}
 
 <b>PREDICTIONPULSE:</b>
 • Total Reports: {pred_total}
