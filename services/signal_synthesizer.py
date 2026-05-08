@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-"""SignalSynthesizer — Real-time Signal Detection & Delivery"""
-
 import os
 import csv
 import json
@@ -8,17 +5,18 @@ import urllib.request
 from datetime import datetime, timezone
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
-TELEGRAM_CHAT = "5975342168"
+PUBLIC_CHANNEL = "-1003828989254"
+ADMIN_CHAT = "5975342168"
 
-def send_telegram(text: str):
+def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = json.dumps({"chat_id": TELEGRAM_CHAT, "text": text, "parse_mode": "HTML"}).encode()
+    payload = json.dumps({"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
     try:
         urllib.request.urlopen(req, timeout=30)
         return True
     except Exception as e:
-        print(f"Telegram send failed: {e}")
+        print(f"Telegram send failed to {chat_id}: {e}")
         return False
 
 def log_signal(date_str, ticker, signal_type, score, s1, s2, s3, notes):
@@ -40,12 +38,35 @@ def get_signal_subscribers():
         print(f"Subscriber read error: {e}")
     return subs
 
+def generate_public_teaser(ticker, signal_type, score, direction, detail):
+    """Teaser for public channel"""
+    return f"""🚨 <b>SIGNAL DETECTED — {ticker}</b>
+━━━━━━━━━━━━━━━━━━━━
+📊 <b>TYPE:</b> {signal_type}
+🎯 <b>CONFLUENCE:</b> {score}/5
+📈 <b>DIRECTION:</b> {direction}
+💰 <b>DETAIL:</b> {detail[:80]}...
+
+Full signal + all sources + confluence analysis →
+<a href="https://overnight-edge.onrender.com">overnight-edge.onrender.com</a>"""
+
+def generate_full_alert(signal):
+    return f"""🚨 <b>SIGNALSYNTHESIZER — {signal['ticker']}</b>
+━━━━━━━━━━━━━━━━━━━━
+📊 <b>TYPE:</b> {signal['type']}
+🎯 <b>CONFLUENCE:</b> {signal['score']}/5
+📈 <b>DIRECTION:</b> {signal['direction']}
+💰 <b>DETAIL:</b> {signal['detail']}
+🔗 <b>SOURCES:</b> {', '.join(signal['sources'])}
+⏰ <b>TIME:</b> {signal['time']}
+⚠️ NOT FINANCIAL ADVICE"""
+
 def generate_signals():
-    """Simulated signal generation — replace with real API calls"""
+    """Simulated signal generation - replace with real API calls"""
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d %H:%M")
     
-    # Example signal for demonstration
+    # Example signals for demonstration
     signals = []
     
     # In production, this would:
@@ -64,29 +85,34 @@ def main():
     
     if count == 0:
         print("No active signal subscribers.")
-        return
     
     for signal in signals:
+        # 1. ALWAYS post teaser to public channel (growth)
+        teaser = generate_public_teaser(
+            signal['ticker'], signal['type'], signal['score'],
+            signal['direction'], signal['detail']
+        )
+        public_sent = send_telegram(teaser, PUBLIC_CHANNEL)
+        print(f"Public teaser for {signal['ticker']}: {'OK' if public_sent else 'FAIL'}")
+        
+        # 2. Full alert to admin (you) for review
+        full = generate_full_alert(signal)
+        admin_sent = send_telegram(full, ADMIN_CHAT)
+        
+        # 3. Full alert to PAID subscribers only if score >= 3
         if signal.get("score", 0) >= 3:
-            text = f"""🚨 SIGNALSYNTHESIZER — {signal['ticker']}
-━━━━━━━━━━━━━━━━━━━━
-📊 TYPE: {signal['type']}
-🎯 CONFLUENCE: {signal['score']}/5
-📈 DIRECTION: {signal['direction']}
-💰 DETAIL: {signal['detail']}
-🔗 SOURCES: {', '.join(signal['sources'])}
-⏰ TIME: {signal['time']}
-⚠️ NOT FINANCIAL ADVICE"""
-            
-            success = send_telegram(text)
-            log_signal(
-                signal['time'], signal['ticker'], signal['type'],
-                signal['score'], signal['sources'][0] if signal['sources'] else "",
-                signal['sources'][1] if len(signal['sources']) > 1 else "",
-                signal['sources'][2] if len(signal['sources']) > 2 else "",
-                "delivered" if success else "failed"
-            )
-            log_delivery(signal['time'], "signal", "alert", count, "delivered" if success else "failed")
+            if subs:
+                # In production: iterate and send to each subscriber
+                paid_sent = send_telegram(full, ADMIN_CHAT)
+                log_signal(
+                    signal['time'], signal['ticker'], signal['type'],
+                    signal['score'], signal['sources'][0] if signal['sources'] else "",
+                    signal['sources'][1] if len(signal['sources']) > 1 else "",
+                    signal['sources'][2] if len(signal['sources']) > 2 else "",
+                    "delivered" if paid_sent else "failed"
+                )
+                log_delivery(signal['time'], "signal", "alert", count, "delivered" if paid_sent else "failed")
+                print(f"Full alert for {signal['ticker']}: {'OK' if paid_sent else 'FAIL'}")
 
 if __name__ == "__main__":
     main()

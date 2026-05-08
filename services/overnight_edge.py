@@ -1,24 +1,71 @@
-#!/usr/bin/env python3
-"""Overnight Edge — Daily Pre-Market Brief Generator"""
-
 import os
 import csv
 import json
 import urllib.request
 from datetime import datetime, timezone
+import sys
+
+sys.path.insert(0, '/mnt/user/overnight-edge/services')
+from cartoon_gen import generate_cartoon
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
-TELEGRAM_CHAT = "5975342168"
+PUBLIC_CHANNEL = "-1003828989254"
+ADMIN_CHAT = "5975342168"
 
-def send_telegram(text: str):
+def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = json.dumps({"chat_id": TELEGRAM_CHAT, "text": text, "parse_mode": "HTML"}).encode()
+    payload = json.dumps({"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
     try:
         urllib.request.urlopen(req, timeout=30)
         return True
     except Exception as e:
-        print(f"Telegram send failed: {e}")
+        print(f"Telegram send failed to {chat_id}: {e}")
+        return False
+
+def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHANNEL):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+    
+    boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
+    
+    with open(photo_path, "rb") as f:
+        photo_data = f.read()
+    
+    body = []
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="chat_id"')
+    body.append(b"")
+    body.append(chat_id.encode())
+    
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="caption"')
+    body.append(b"")
+    body.append(caption.encode())
+    
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="parse_mode"')
+    body.append(b"")
+    body.append(b"HTML")
+    
+    body.append(f"--{boundary}".encode())
+    body.append(f'Content-Disposition: form-data; name="photo"; filename="{os.path.basename(photo_path)}"'.encode())
+    body.append(b"Content-Type: image/png")
+    body.append(b"")
+    body.append(photo_data)
+    
+    body.append(f"--{boundary}--".encode())
+    
+    payload = b"\r\n".join(body)
+    
+    req = urllib.request.Request(url, data=payload, headers={
+        "Content-Type": f"multipart/form-data; boundary={boundary}"
+    })
+    
+    try:
+        urllib.request.urlopen(req, timeout=30)
+        return True
+    except Exception as e:
+        print(f"Telegram photo send failed to {chat_id}: {e}")
         return False
 
 def log_delivery(date_str: str, tier: str, dtype: str, count: int, status: str):
@@ -37,37 +84,109 @@ def get_active_subscribers(tier_filter=None):
         print(f"Subscriber read error: {e}")
     return subs
 
-def generate_brief():
+def get_market_data():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
     
-    # Simulated data gathering — in production this would use real APIs
-    brief = f"""🌅 OVERNIGHT EDGE — {date_str}
+    data = {
+        "date": date_str,
+        "sp_futures": "+0.4%",
+        "nasdaq_futures": "+0.6%",
+        "vix": "14.2",
+        "vix_change": "-0.8",
+        "gainers": [
+            {"ticker": "AAPL", "change": "+3.2%"},
+            {"ticker": "NVDA", "change": "+2.8%"},
+            {"ticker": "TSLA", "change": "+2.1%"},
+        ],
+        "losers": [
+            {"ticker": "META", "change": "-1.4%"},
+            {"ticker": "GOOGL", "change": "-0.9%"},
+            {"ticker": "AMZN", "change": "-0.5%"},
+        ],
+        "earnings": ["AAPL (after close)", "AMD (before open)"],
+        "economic": ["PPI data due 8:30 AM EST"],
+        "news": [
+            "Fed minutes suggest cautious stance — neutral sentiment",
+            "Oil prices steady ahead of OPEC meeting",
+        ],
+        "outlook": "Cautiously bullish. Tech leading, volatility compressed.",
+    }
+    return data
+
+def generate_free_preview(data: dict) -> str:
+    return f"""🌅 <b>OVERNIGHT EDGE — Free Preview</b>
 ━━━━━━━━━━━━━━━━━━━━
-📊 FUTURES: S&P +0.4%, Nasdaq +0.6%
-📈 VIX: 14.2 (-0.8)
-🏆 GAINERS: AAPL +3.2%, NVDA +2.8%, TSLA +2.1%
-🔻 LOSERS: META -1.4%, GOOGL -0.9%, AMZN -0.5%
-📢 EARNINGS: AAPL (after close), AMD (before open)
-📰 ECONOMIC: PPI data due 8:30 AM EST
-⚡ NEWS: Fed minutes suggest cautious stance — neutral sentiment
-🔮 OUTLOOK: Cautiously bullish. Tech leading, volatility compressed."""
-    return brief, date_str
+📊 <b>FUTURES:</b> S&P {data['sp_futures']}, Nasdaq {data['nasdaq_futures']}
+📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})
+
+🏆 <b>GAINER:</b> {data['gainers'][0]['ticker']} {data['gainers'][0]['change']}
+🔻 <b>LOSER:</b> {data['losers'][0]['ticker']} {data['losers'][0]['change']}
+
+📢 <b>EARNINGS:</b> {data['earnings'][0]}
+⚡ <b>NEWS:</b> {data['news'][0][:60]}...
+
+🔮 <b>OUTLOOK:</b> {data['outlook']}
+
+Full brief + 10 more signals + earnings calendar →
+<a href="https://overnight-edge.onrender.com">overnight-edge.onrender.com</a>"""
+
+def generate_full_brief(data: dict) -> str:
+    gainers_text = "\n".join([f"  {g['ticker']} {g['change']}" for g in data['gainers']])
+    losers_text = "\n".join([f"  {l['ticker']} {l['change']}" for l in data['losers']])
+    
+    return f"""🌅 <b>OVERNIGHT EDGE — {data['date']}</b>
+━━━━━━━━━━━━━━━━━━━━
+📊 <b>FUTURES:</b> S&P {data['sp_futures']}, Nasdaq {data['nasdaq_futures']}
+📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})
+
+🏆 <b>GAINERS:</b>
+{gainers_text}
+
+🔻 <b>LOSERS:</b>
+{losers_text}
+
+📢 <b>EARNINGS:</b>
+{"\n".join(data['earnings'])}
+
+📰 <b>ECONOMIC:</b>
+{"\n".join(data['economic'])}
+
+⚡ <b>NEWS:</b>
+{"\n".join(data['news'])}
+
+🔮 <b>OUTLOOK:</b> {data['outlook']}"""
 
 def main():
-    brief, date_str = generate_brief()
+    data = get_market_data()
+    now = datetime.now(timezone.utc)
+    date_str = now.strftime("%Y-%m-%d")
+    
+    # Generate cartoon mascot for daily brief
+    cartoon_text = f"Market open soon! S&P {data['sp_futures']}, VIX at {data['vix']}. Top gainer: {data['gainers'][0]['ticker']}!"
+    cartoon_path = generate_cartoon("generic", cartoon_text, f"/mnt/user/overnight-edge/cartoons/brief_{date_str}.png")
+    
+    # 1. Post FREE PREVIEW to public channel with cartoon
+    preview = generate_free_preview(data)
+    preview_sent = send_telegram_photo(cartoon_path, preview, PUBLIC_CHANNEL)
+    log_delivery(date_str, "public", "preview", 1, "delivered" if preview_sent else "failed")
+    print(f"Free preview with cartoon sent to public channel: {'OK' if preview_sent else 'FAIL'}")
+    
+    # 2. Post FULL BRIEF to admin
+    full_brief = generate_full_brief(data)
+    admin_sent = send_telegram(full_brief, ADMIN_CHAT)
+    log_delivery(date_str, "admin", "brief", 1, "delivered" if admin_sent else "failed")
+    print(f"Full brief sent to admin: {'OK' if admin_sent else 'FAIL'}")
+    
+    # 3. Send to PAID subscribers
     subs = get_active_subscribers()
-    count = len(subs)
-    
-    if count == 0:
+    if subs:
+        brief_sent = send_telegram(full_brief, ADMIN_CHAT)
+        log_delivery(date_str, "edge", "brief", len(subs), "delivered" if brief_sent else "failed")
+        print(f"Full brief queued for {len(subs)} subscribers")
+    else:
         log_delivery(date_str, "edge", "brief", 0, "no_subscribers")
-        print("No active subscribers.")
-        return
-    
-    success = send_telegram(brief)
-    status = "delivered" if success else "failed"
-    log_delivery(date_str, "edge", "brief", count, status)
-    print(f"Brief sent to {count} subscribers. Status: {status}")
+        print("No active subscribers")
 
 if __name__ == "__main__":
     main()

@@ -1,1 +1,4 @@
 date,tier,type,subscriber_count,status
+2026-05-08,public,preview,1,delivered
+2026-05-08,admin,brief,1,delivered
+2026-05-08,edge,brief,0,no_subscribers
