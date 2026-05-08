@@ -1,94 +1,194 @@
-#!/usr/bin/env python3
-"""Weekly Audit Report Generator"""
-
 import os
 import csv
-import json
+from datetime import datetime, timezone, timedelta
 import urllib.request
-from datetime import datetime, timezone
-from collections import Counter
+import json
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
-TELEGRAM_CHAT = "5975342168"
+ADMIN_CHAT = "5975342168"
+LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
 
-def send_telegram(text: str):
+def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = json.dumps({"chat_id": TELEGRAM_CHAT, "text": text, "parse_mode": "HTML"}).encode()
+    payload = json.dumps({"chat_id": ADMIN_CHAT, "text": text, "parse_mode": "HTML"}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
     try:
         urllib.request.urlopen(req, timeout=30)
         return True
     except Exception as e:
-        print(f"Telegram send failed: {e}")
+        print(f"Send failed: {e}")
         return False
 
-def get_subscriber_stats():
-    edge_active = edge_cancelled = signal_active = signal_cancelled = 0
+def send_telegram_photo(photo_path, caption):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+    boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
+    import base64
+    with open(photo_path, "rb") as f:
+        photo_data = f.read()
+    body = []
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="chat_id"')
+    body.append(b"")
+    body.append(ADMIN_CHAT.encode())
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="caption"')
+    body.append(b"")
+    body.append(caption.encode())
+    body.append(f"--{boundary}".encode())
+    body.append(b'Content-Disposition: form-data; name="parse_mode"')
+    body.append(b"")
+    body.append(b"HTML")
+    body.append(f"--{boundary}".encode())
+    body.append(f'Content-Disposition: form-data; name="photo"; filename="{os.path.basename(photo_path)}"'.encode())
+    body.append(b"Content-Type: image/jpeg")
+    body.append(b"")
+    body.append(photo_data)
+    body.append(f"--{boundary}--".encode())
+    payload = b"\r\n".join(body)
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    try:
+        urllib.request.urlopen(req, timeout=30)
+        return True
+    except Exception as e:
+        print(f"Photo send failed: {e}")
+        return False
+
+def count_subscribers():
+    tiers = {"digest": 0, "signal": 0, "x10": 0, "x20": 0, "pulse-core": 0, "pulse-pro": 0}
+    cancelled = 0
     try:
         with open("/mnt/user/overnight-edge/subscribers.csv", "r") as f:
             for row in csv.DictReader(f):
                 tier = row.get("tier", "")
                 status = row.get("status", "")
-                if tier == "edge" and status == "active":
-                    edge_active += 1
-                elif tier == "edge" and status == "cancelled":
-                    edge_cancelled += 1
-                elif tier == "signal" and status == "active":
-                    signal_active += 1
-                elif tier == "signal" and status == "cancelled":
-                    signal_cancelled += 1
-    except Exception as e:
-        print(f"Subscriber read error: {e}")
-    
-    mrr = (edge_active * 49) + (signal_active * 149)
-    return edge_active, edge_cancelled, signal_active, signal_cancelled, mrr
+                if status == "active" and tier in tiers:
+                    tiers[tier] += 1
+                elif status == "cancelled":
+                    cancelled += 1
+    except:
+        pass
+    return tiers, cancelled
 
-def get_delivery_stats():
-    brief_success = brief_total = 0
-    signal_counts = Counter()
-    
+def count_signals():
+    score_counts = {"3": 0, "4": 0, "5": 0}
+    total = 0
+    try:
+        with open("/mnt/user/overnight-edge/signal_accuracy.csv", "r") as f:
+            for row in csv.DictReader(f):
+                score = row.get("confluence_score", "")
+                if score in score_counts:
+                    score_counts[score] += 1
+                    total += 1
+    except:
+        pass
+    return score_counts, total
+
+def count_xsignals():
+    total = 0
+    top_accounts = {}
+    try:
+        with open("/mnt/user/overnight-edge/xsignal_log.csv", "r") as f:
+            for row in csv.DictReader(f):
+                total += 1
+                accounts = row.get("accounts_triggering", "").split(", ")
+                for a in accounts:
+                    top_accounts[a] = top_accounts.get(a, 0) + 1
+    except:
+        pass
+    top_5 = sorted(top_accounts.items(), key=lambda x: x[1], reverse=True)[:5]
+    return total, top_5
+
+def count_predictions():
+    divergences = 0
+    total = 0
+    try:
+        with open("/mnt/user/overnight-edge/prediction_log.csv", "r") as f:
+            for row in csv.DictReader(f):
+                total += 1
+                if row.get("divergence_flag", "") == "YES":
+                    divergences += 1
+    except:
+        pass
+    return total, divergences
+
+def count_deliveries():
+    total_briefs = 0
+    total_alerts = 0
+    failed = 0
     try:
         with open("/mnt/user/overnight-edge/delivery_log.csv", "r") as f:
             for row in csv.DictReader(f):
-                if row.get("type") == "brief":
-                    brief_total += 1
-                    if row.get("status") == "delivered":
-                        brief_success += 1
-                elif row.get("type") == "alert":
-                    score = row.get("confluence_score", "3")
-                    signal_counts[score] += 1
-    except Exception as e:
-        print(f"Delivery log read error: {e}")
-    
-    success_rate = (brief_success / brief_total * 100) if brief_total > 0 else 0
-    return brief_success, brief_total, success_rate, signal_counts
+                dtype = row.get("type", "")
+                status = row.get("status", "")
+                if "brief" in dtype:
+                    total_briefs += 1
+                elif "alert" in dtype:
+                    total_alerts += 1
+                if status != "delivered":
+                    failed += 1
+    except:
+        pass
+    return total_briefs, total_alerts, failed
 
 def main():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
     
-    edge_active, edge_cx, signal_active, signal_cx, mrr = get_subscriber_stats()
-    brief_ok, brief_total, rate, signals = get_delivery_stats()
+    tiers, cancelled = count_subscribers()
+    score_counts, signal_total = count_signals()
+    x_total, x_top = count_xsignals()
+    pred_total, pred_div = count_predictions()
+    briefs, alerts, failed = count_deliveries()
     
-    report = f"""📊 WEEKLY AUDIT — {date_str}
+    mrr = (
+        tiers["digest"] * 49 +
+        tiers["signal"] * 149 +
+        tiers["x10"] * 249 +
+        tiers["x20"] * 449 +
+        tiers["pulse-core"] * 299 +
+        tiers["pulse-pro"] * 499
+    )
+    
+    x_top_text = "\n".join([f"• @{a}: {c} alerts" for a, c in x_top]) if x_top else "• No XSignal data yet"
+    
+    report = f"""📊 <b>WEEKLY AUDIT — {date_str}</b>
 ━━━━━━━━━━━━━━━━━━━━
-👥 SUBSCRIBERS
-• Active Edge: {edge_active}
-• Active Signal: {signal_active}
-• Cancelled Edge: {edge_cx}
-• Cancelled Signal: {signal_cx}
-💰 MRR: ${mrr}
 
-📈 DELIVERY
-• Brief success: {brief_ok}/{brief_total} ({rate:.1f}%)
-• Signals by score: {dict(signals)}
+<b>SUBSCRIBERS:</b>
+• Daily Digest ($49): {tiers['digest']}
+• Signal ($149): {tiers['signal']}
+• X10 ($249): {tiers['x10']}
+• X20 ($449): {tiers['x20']}
+• PredictionCore ($299): {tiers['pulse-core']}
+• Prediction Pro ($499): {tiers['pulse-pro']}
+• Cancelled: {cancelled}
+• <b>Total MRR: ${mrr}/mo</b>
 
-⚠️ ISSUES
-• None flagged this week.
-"""
+<b>SIGNALS SENT:</b>
+• Score 3 (Strong): {score_counts['3']}
+• Score 4 (Very Strong): {score_counts['4']}
+• Score 5 (Extreme): {score_counts['5']}
+• Signal Total: {signal_total}
+
+<b>XSIGNAL PERFORMANCE:</b>
+• Total Alerts: {x_total}
+• Top Accounts:
+{x_top_text}
+
+<b>PREDICTIONPULSE:</b>
+• Total Reports: {pred_total}
+• Divergences Flagged: {pred_div}
+
+<b>DELIVERY:</b>
+• Briefs: {briefs}
+• Alerts: {alerts}
+• Failed: {failed}
+• Success Rate: {(briefs+alerts)/(briefs+alerts+failed)*100:.1f}% if (briefs+alerts+failed) > 0 else "N/A"
+
+⚠️ Automated by KimiClaw AI. Not financial advice."""
     
-    success = send_telegram(report)
-    print(f"Audit sent. Status: {'delivered' if success else 'failed'}")
+    send_telegram_photo(LOGO_PATH, report)
+    print("Weekly audit sent")
 
 if __name__ == "__main__":
     main()

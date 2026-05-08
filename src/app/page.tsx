@@ -1,66 +1,154 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero */}
-      <section className="flex flex-col items-center justify-center px-4 py-24 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-          Overnight Edge
-        </h1>
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
-          AI-generated market intelligence. Zero humans. Delivered to your Telegram before the market opens.
-        </p>
-      </section>
-
-      {/* Cards */}
-      <section className="px-4 py-12 max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-        {/* Card 1 */}
-        <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
-          <h2 className="text-2xl font-bold mb-2">Daily Brief</h2>
-          <p className="text-[#00c853] text-xl font-semibold mb-6">$49/mo</p>
-          <ul className="space-y-3 text-gray-400 mb-8 text-left">
-            <li>Pre-market brief every trading day 8:00 AM EST</li>
-            <li>S&P 500/Nasdaq futures, VIX, gainers/losers</li>
-            <li>Earnings, economic data, breaking news</li>
-          </ul>
-          <a
-            href="https://buy.stripe.com/prod_UTd168i0Iw8b3M"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block w-full text-center bg-[#00c853] text-black font-semibold py-3 rounded-lg hover:bg-[#00b34a] transition-colors"
-          >
-            Subscribe
-          </a>
+    <main className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16">
+      <div className="max-w-6xl mx-auto">
+        {/* Hero */}
+        <div className="text-center mb-20">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            Overnight Edge
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto">
+            AI-powered market intelligence. Zero humans. Delivered to your Telegram.
+          </p>
         </div>
 
-        {/* Card 2 */}
-        <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
-          <h2 className="text-2xl font-bold mb-2">SignalSynthesizer</h2>
-          <p className="text-[#00c853] text-xl font-semibold mb-6">$149/mo</p>
-          <ul className="space-y-3 text-gray-400 mb-8 text-left">
-            <li>Everything in Daily Brief, plus:</li>
-            <li>Congressional trade alerts (STOCK Act)</li>
-            <li>Insider filings (SEC Form 4)</li>
-            <li>Unusual options flow, dark pool prints</li>
-            <li>Confluence scoring 3/5 minimum to alert</li>
-            <li>Real-time delivery</li>
-          </ul>
-          <a
-            href="https://buy.stripe.com/prod_UTd2L2yQEam5Cl"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block w-full text-center bg-[#00c853] text-black font-semibold py-3 rounded-lg hover:bg-[#00b34a] transition-colors"
-          >
-            Subscribe
-          </a>
-        </div>
-      </section>
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1 — Daily Digest */}
+          <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 1</div>
+            <h2 className="text-2xl font-bold mb-2">Daily Digest</h2>
+            <div className="text-4xl font-bold mb-6">$49<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Pre-market brief every trading day 8:00 AM EST</li>
+              <li>S&P 500 / Nasdaq futures</li>
+              <li>VIX, gainers/losers</li>
+              <li>Earnings, economic data</li>
+              <li>Breaking news with sentiment</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTd168i0Iw8b3M"
+              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
 
-      {/* Footer */}
-      <footer className="px-4 py-12 text-center text-gray-600 text-sm">
-        <p>Fully automated by KimiClaw AI. Cancel anytime in Stripe. Not financial advice.</p>
-      </footer>
+          {/* Card 2 — Signal Synthesizer */}
+          <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 2</div>
+            <h2 className="text-2xl font-bold mb-2">Signal Synthesizer</h2>
+            <div className="text-4xl font-bold mb-6">$149<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Everything in Daily Digest</li>
+              <li>Congressional trade alerts (STOCK Act)</li>
+              <li>Insider filings (SEC Form 4)</li>
+              <li>Unusual options flow</li>
+              <li>Dark pool prints</li>
+              <li>Confluence scoring 3/5 minimum</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTd2L2yQEam5Cl"
+              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
+
+          {/* Card 3 — X10 Signal */}
+          <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 3</div>
+            <h2 className="text-2xl font-bold mb-2">X10 Signal</h2>
+            <div className="text-4xl font-bold mb-6">$249<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Everything in Signal Synthesizer</li>
+              <li>20 top trading accounts on X</li>
+              <li>Perps, derivatives, synthetics</li>
+              <li>Equities, commodities, FX</li>
+              <li>Every 30 min during market hours</li>
+              <li>Confluence scoring on keyword matches</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTmCN8WfEm86rk"
+              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
+
+          {/* Card 4 — X20 Signal */}
+          <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 4</div>
+            <h2 className="text-2xl font-bold mb-2">X20 Signal</h2>
+            <div className="text-4xl font-bold mb-6">$449<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Everything in X10 Signal</li>
+              <li>Full X search beyond 20 accounts</li>
+              <li>Cross-asset correlation scoring</li>
+              <li>Instant high-confluence alerts (4+)</li>
+              <li>End-of-day synthesis report</li>
+              <li>15-minute cadence</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTmCJV925O2pvU"
+              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
+
+          {/* Card 5 — PredictionCore */}
+          <div className="border border-gray-800 rounded-2xl p-8 hover:border-[#00c853] transition-colors">
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 5</div>
+            <h2 className="text-2xl font-bold mb-2">PredictionCore</h2>
+            <div className="text-4xl font-bold mb-6">$299<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Everything in X10 Signal</li>
+              <li>Polymarket, Kalshi, DraftKings</li>
+              <li>X sentiment, 538, ESPN BPI</li>
+              <li>Politics, sports, crypto, economics</li>
+              <li>Consensus probability + divergence alerts</li>
+              <li>4x daily reports</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTmghR9ygJVPZb"
+              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
+
+          {/* Card 6 — Prediction Pro */}
+          <div className="border border-[#00c853] rounded-2xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-[#00c853] text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
+              ULTIMATE
+            </div>
+            <div className="text-[#00c853] text-sm font-semibold mb-2">TIER 6</div>
+            <h2 className="text-2xl font-bold mb-2">Prediction Pro</h2>
+            <div className="text-4xl font-bold mb-6">$499<span className="text-lg text-gray-400">/mo</span></div>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li>Everything in all tiers</li>
+              <li>Instant shift alerts (&gt;5% moves)</li>
+              <li>New high-volume market detection</li>
+              <li>X sentiment divergence tracking</li>
+              <li>End-of-day probability shift report</li>
+              <li>Custom watchlists (coming soon)</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/test_prod_UTmhMhmW6G3r4D"
+              className="block w-full text-center bg-[#00c853] text-black font-semibold py-3 rounded-lg hover:bg-[#00a844] transition-colors"
+            >
+              Subscribe
+            </a>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-20 text-center text-gray-500 text-sm">
+          <p>Fully automated by KimiClaw AI. Cancel anytime in Stripe.</p>
+          <p className="mt-2">Not financial advice. Informational purposes only.</p>
+        </div>
+      </div>
     </main>
   );
 }

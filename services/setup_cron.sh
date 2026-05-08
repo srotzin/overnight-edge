@@ -1,25 +1,39 @@
 #!/bin/bash
-# Setup cron jobs for Overnight Edge services
+# Overnight Edge — Complete 6-Service Cron Setup
 
-# Remove old entries if they exist
-crontab -l 2>/dev/null | grep -v "overnight-edge" | crontab -
+CRON_FILE=$(mktemp)
 
-# Add new entries
-(crontab -l 2>/dev/null; cat <<'CRON'
-# Overnight Edge - Daily Brief at 7:45 AM EST (11:45 UTC) - FREE PREVIEW
-45 11 * * 1-5 cd /mnt/user/overnight-edge && python3 services/overnight_edge.py >> /mnt/user/overnight-edge/services/edge.log 2>&1
+# 1. Daily Digest — 7:30 AM EST (11:30 UTC)
+echo "30 11 * * 1-5 cd /mnt/user/overnight-edge && python3 services/overnight_edge.py >> /mnt/user/overnight-edge/services/edge.log 2>&1" >> "$CRON_FILE"
 
-# EDGAR Monitor - Congressional + Insider + 8-K (every 15 min during market hours)
-*/15 14-21 * * 1-5 cd /mnt/user/overnight-edge && python3 services/edgar_monitor.py >> /mnt/user/overnight-edge/services/edgar.log 2>&1
+# 2. EDGAR Monitor — every 15 min during market hours (14:00-21:00 UTC, Mon-Fri)
+echo "*/15 14-21 * * 1-5 cd /mnt/user/overnight-edge && python3 services/edgar_monitor.py >> /mnt/user/overnight-edge/services/edgar.log 2>&1" >> "$CRON_FILE"
 
-# SignalSynthesizer - Every 30 min during market hours (9:30 AM - 4:00 PM EST)
-*/30 14-20 * * 1-5 cd /mnt/user/overnight-edge && python3 services/signal_synthesizer.py >> /mnt/user/overnight-edge/services/signal.log 2>&1
-0 21 * * 1-5 cd /mnt/user/overnight-edge && python3 services/signal_synthesizer.py >> /mnt/user/overnight-edge/services/signal.log 2>&1
+# 3. Signal Synthesizer — every 30 min during market hours + 21:00 UTC close
+echo "*/30 14-20 * * 1-5 cd /mnt/user/overnight-edge && python3 services/signal_synthesizer.py >> /mnt/user/overnight-edge/services/signal.log 2>&1" >> "$CRON_FILE"
+echo "0 21 * * 1-5 cd /mnt/user/overnight-edge && python3 services/signal_synthesizer.py >> /mnt/user/overnight-edge/services/signal.log 2>&1" >> "$CRON_FILE"
 
-# Weekly Audit - Sundays at 12:00 PM EST (17:00 UTC)
-0 17 * * 0 cd /mnt/user/overnight-edge && python3 services/weekly_audit.py >> /mnt/user/overnight-edge/services/audit.log 2>&1
-CRON
-) | crontab -
+# 4. X10 Signal — every 30 min during market hours
+echo "*/30 14-20 * * 1-5 cd /mnt/user/overnight-edge && python3 services/xsignal_basic.py >> /mnt/user/overnight-edge/services/x10.log 2>&1" >> "$CRON_FILE"
 
-echo "Cron jobs installed:"
+# 5. X20 Signal — every 15 min during market hours + EOD synthesis at 21:30 UTC (4:30 PM EST)
+echo "*/15 14-20 * * 1-5 cd /mnt/user/overnight-edge && python3 services/xsignal_pro.py >> /mnt/user/overnight-edge/services/x20.log 2>&1" >> "$CRON_FILE"
+echo "30 21 * * 1-5 cd /mnt/user/overnight-edge && python3 services/xsignal_pro.py >> /mnt/user/overnight-edge/services/x20.log 2>&1" >> "$CRON_FILE"
+
+# 6. PredictionCore — 4x daily: 8 AM, 12 PM, 4 PM, 8 PM EST (12:00, 16:00, 20:00, 00:00 UTC)
+echo "0 12,16,20,0 * * * cd /mnt/user/overnight-edge && python3 services/prediction_core.py >> /mnt/user/overnight-edge/services/pulse.log 2>&1" >> "$CRON_FILE"
+
+# 7. Prediction Pro — every 30 min during active hours (12:00-01:00 UTC) + EOD at 23:00 UTC
+echo "*/30 12-23 * * * cd /mnt/user/overnight-edge && python3 services/prediction_pro.py >> /mnt/user/overnight-edge/services/pro.log 2>&1" >> "$CRON_FILE"
+echo "0 0-1 * * * cd /mnt/user/overnight-edge && python3 services/prediction_pro.py >> /mnt/user/overnight-edge/services/pro.log 2>&1" >> "$CRON_FILE"
+echo "0 23 * * * cd /mnt/user/overnight-edge && python3 services/prediction_pro.py >> /mnt/user/overnight-edge/services/pro.log 2>&1" >> "$CRON_FILE"
+
+# 8. Weekly Audit — Sundays 12 PM EST (16:00 UTC)
+echo "0 16 * * 0 cd /mnt/user/overnight-edge && python3 services/weekly_audit.py >> /mnt/user/overnight-edge/services/audit.log 2>&1" >> "$CRON_FILE"
+
+# Install
+crontab "$CRON_FILE"
+rm "$CRON_FILE"
+
+echo "All 6 services cron jobs installed:"
 crontab -l | grep overnight-edge

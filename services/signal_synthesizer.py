@@ -74,15 +74,16 @@ def log_delivery(date_str, tier, dtype, count, status):
     with open("/mnt/user/overnight-edge/delivery_log.csv", "a", newline="") as f:
         csv.writer(f).writerow([date_str, tier, dtype, count, status])
 
-def get_signal_subscribers():
+def get_subscribers(tier_filter=None):
     subs = []
     try:
         with open("/mnt/user/overnight-edge/subscribers.csv", "r") as f:
             for row in csv.DictReader(f):
-                if row.get("status") == "active" and row.get("tier") == "signal":
-                    subs.append(row)
-    except Exception as e:
-        print(f"Subscriber read error: {e}")
+                if row.get("status") == "active":
+                    if tier_filter is None or row.get("tier") == tier_filter:
+                        subs.append(row)
+    except:
+        pass
     return subs
 
 def generate_public_teaser(ticker, signal_type, score, direction, detail):
@@ -115,11 +116,6 @@ def generate_signals():
 
 def main():
     signals = generate_signals()
-    subs = get_signal_subscribers()
-    count = len(subs)
-    
-    if count == 0:
-        print("No active signal subscribers.")
     
     for signal in signals:
         # 1. ALWAYS post teaser to public channel (growth) with dark logo
@@ -132,21 +128,28 @@ def main():
         
         # 2. Full alert to admin (you) for review
         full = generate_full_alert(signal)
-        admin_sent = send_telegram(full, ADMIN_CHAT)
+        send_telegram(full, ADMIN_CHAT)
         
-        # 3. Full alert to PAID subscribers only if score >= 3
+        # 3. Full alert to PAID subscribers: signal, x10, x20, pulse-core, pulse-pro
         if signal.get("score", 0) >= 3:
-            if subs:
-                paid_sent = send_telegram_photo(LOGO_PATH, full, ADMIN_CHAT)
-                log_signal(
-                    signal['time'], signal['ticker'], signal['type'],
-                    signal['score'], signal['sources'][0] if signal['sources'] else "",
-                    signal['sources'][1] if len(signal['sources']) > 1 else "",
-                    signal['sources'][2] if len(signal['sources']) > 2 else "",
-                    "delivered" if paid_sent else "failed"
-                )
-                log_delivery(signal['time'], "signal", "alert", count, "delivered" if paid_sent else "failed")
-                print(f"Full alert for {signal['ticker']}: {'OK' if paid_sent else 'FAIL'}")
+            total_subs = 0
+            for tier in ["signal", "x10", "x20", "pulse-core", "pulse-pro"]:
+                subs = get_subscribers(tier)
+                total_subs += len(subs)
+                for sub in subs:
+                    tg_id = sub.get("telegram_id", "")
+                    if tg_id:
+                        send_telegram(full, tg_id)
+            
+            log_signal(
+                signal['time'], signal['ticker'], signal['type'],
+                signal['score'], signal['sources'][0] if signal['sources'] else "",
+                signal['sources'][1] if len(signal['sources']) > 1 else "",
+                signal['sources'][2] if len(signal['sources']) > 2 else "",
+                "delivered"
+            )
+            log_delivery(signal['time'], "signal", "alert", total_subs, "delivered")
+            print(f"Full alert for {signal['ticker']}: OK ({total_subs} subscribers)")
 
 if __name__ == "__main__":
     main()

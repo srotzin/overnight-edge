@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Overnight Edge — AI Market Intelligence",
-  description: "AI-generated market intelligence. Zero humans. Delivered before the market opens.",
+  title: "Overnight Edge — AI-Powered Market Intelligence",
+  description: "Zero humans. Delivered to your Telegram before the market opens. Daily Digest, Signal Synthesizer, X10 Signal, X20 Signal, PredictionCore, Prediction Pro.",
 };
 
 export default function RootLayout({

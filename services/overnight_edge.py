@@ -115,7 +115,7 @@ def get_market_data():
     return data
 
 def generate_free_preview(data: dict) -> str:
-    return f"""🌅 <b>OVERNIGHT EDGE — Free Preview</b>
+    return f"""🌅 <b>DAILY DIGEST — Free Preview</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>FUTURES:</b> S&P {data['sp_futures']}, Nasdaq {data['nasdaq_futures']}
 📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})
@@ -135,7 +135,7 @@ def generate_full_brief(data: dict) -> str:
     gainers_text = "\n".join([f"  {g['ticker']} {g['change']}" for g in data['gainers']])
     losers_text = "\n".join([f"  {l['ticker']} {l['change']}" for l in data['losers']])
     
-    return f"""🌅 <b>OVERNIGHT EDGE — {data['date']}</b>
+    return f"""🌅 <b>DAILY DIGEST — {data['date']}</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>FUTURES:</b> S&P {data['sp_futures']}, Nasdaq {data['nasdaq_futures']}
 📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})

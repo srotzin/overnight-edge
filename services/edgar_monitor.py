@@ -82,6 +82,18 @@ def log_signal(date_str, ticker, signal_type, score, s1, s2, s3, notes):
     with open("/mnt/user/overnight-edge/signal_accuracy.csv", "a", newline="") as f:
         csv.writer(f).writerow([date_str, ticker, signal_type, score, s1, s2, s3, notes])
 
+def get_subscribers(tier_filter=None):
+    subs = []
+    try:
+        with open("/mnt/user/overnight-edge/subscribers.csv", "r") as f:
+            for row in csv.DictReader(f):
+                if row.get("status") == "active":
+                    if tier_filter is None or row.get("tier") == tier_filter:
+                        subs.append(row)
+    except:
+        pass
+    return subs
+
 def fetch_edgar_form4():
     """Fetch recent Form 4 filings from EDGAR"""
     try:
@@ -176,7 +188,7 @@ https://overnight-edge.onrender.com"""
         sent = send_telegram_photo(LOGO_PATH, caption, PUBLIC_CHANNEL)
         print(f"Public alert for {ticker}: {'OK' if sent else 'FAIL'}")
     else:
-        # Full alert for paid subscribers
+        # Full alert for paid subscribers: signal, x10, x20, pulse-core, pulse-pro
         caption = f"""🚨 <b>SIGNALSYNTHESIZER — {ticker}</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>TYPE:</b> congressional
@@ -188,6 +200,15 @@ https://overnight-edge.onrender.com"""
 ⚠️ NOT FINANCIAL ADVICE"""
         
         sent = send_telegram_photo(LOGO_PATH, caption, ADMIN_CHAT)
+        
+        # Distribute to all signal-tier subscribers
+        for tier in ["signal", "x10", "x20", "pulse-core", "pulse-pro"]:
+            subs = get_subscribers(tier)
+            for sub in subs:
+                tg_id = sub.get("telegram_id", "")
+                if tg_id:
+                    send_telegram(caption, tg_id)
+        
         log_signal(
             datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
             ticker, 'congressional', score,
