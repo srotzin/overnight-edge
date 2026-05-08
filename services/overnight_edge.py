@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import urllib.request
+import re
 from datetime import datetime, timezone
 import sys
 
@@ -10,6 +11,8 @@ PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
 
 LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
+DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
+LANDING_URL = "https://overnight-edge.onrender.com"
 
 def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -67,6 +70,33 @@ def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHA
     except Exception as e:
         print(f"Telegram photo send failed to {chat_id}: {e}")
         return False
+
+def strip_html(text):
+    """Strip HTML tags for TradingView plain text"""
+    return re.sub(r'<[^>]+>', '', text)
+
+def save_tradingview_draft(title, body):
+    """Save a TradingView-formatted draft to disk"""
+    os.makedirs(DRAFTS_DIR, exist_ok=True)
+    date_slug = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    filename = f"{DRAFTS_DIR}/daily_digest_{date_slug}.txt"
+    
+    footer = f"""━━━
+📡 Get AI-powered market intelligence delivered to Telegram every morning.
+→ {LANDING_URL}
+#premarket #marketanalysis #ai #signals #smartmoney"""
+    
+    content = f"""TITLE: {title}
+
+{body}
+
+{footer}"""
+    
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(content)
+    
+    print(f"TradingView draft saved: {filename}")
+    return filename
 
 def log_delivery(date_str: str, tier: str, dtype: str, count: int, status: str):
     with open("/mnt/user/overnight-edge/delivery_log.csv", "a", newline="") as f:
@@ -183,6 +213,11 @@ def main():
     else:
         log_delivery(date_str, "edge", "brief", 0, "no_subscribers")
         print("No active subscribers")
+
+    # 4. Save TradingView draft
+    tv_title = f"Overnight Edge — {data['date']} | S&P {data['sp_futures']}, VIX {data['vix']}"
+    tv_body = strip_html(full_brief)
+    save_tradingview_draft(tv_title, tv_body)
 
 if __name__ == "__main__":
     main()

@@ -2,11 +2,14 @@ import os
 import csv
 import json
 import urllib.request
+import re
 from datetime import datetime, timezone, timedelta
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_bot.png"
+DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
+LANDING_URL = "https://overnight-edge.onrender.com"
 
 X_BEARER = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
 X_CLIENT_ID = "RFd5RTctLThrb1o2bFQ5US11cno6MTpjaQ"
@@ -55,6 +58,33 @@ def send_telegram_photo(photo_path, caption, chat_id=ADMIN_CHAT):
     except Exception as e:
         print(f"Photo send failed: {e}")
         return False
+
+def strip_html(text):
+    """Strip HTML tags for TradingView plain text"""
+    return re.sub(r'<[^>]+>', '', text)
+
+def save_tradingview_draft(title, body):
+    """Save a TradingView-formatted draft to disk"""
+    os.makedirs(DRAFTS_DIR, exist_ok=True)
+    date_slug = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    filename = f"{DRAFTS_DIR}/sunday_setup_{date_slug}.txt"
+    
+    footer = f"""━━━
+📡 Get AI-powered market intelligence delivered to Telegram every morning.
+→ {LANDING_URL}
+#premarket #marketanalysis #ai #signals #smartmoney"""
+    
+    content = f"""TITLE: {title}
+
+{body}
+
+{footer}"""
+    
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(content)
+    
+    print(f"TradingView draft saved: {filename}")
+    return filename
 
 def get_subscribers(tier_filter=None):
     subs = []
@@ -134,7 +164,7 @@ def generate_brief():
     signals = fetch_signals_synthesis()
     
     # Build calendar lines
-    cal_lines = "\n".join([f" <b>{e['day']}:</b> {e['event']} {e['time']} {f'| Consensus: {e[\"consensus\"]}' if e['consensus'] else ''}" for e in economic])
+    cal_lines = "\n".join([f" <b>{e['day']}:</b> {e['event']} {e['time']}" + (f" | Consensus: {e['consensus']}" if e['consensus'] else "") for e in economic])
     
     # Build earnings lines (top 15, but we simulate 8)
     earn_lines = "\n".join([f" <b>{e['ticker']}:</b> EPS consensus ${e['eps_consensus']} | Rev {e['rev_consensus']} | Whisper ${e['whisper']}" for e in earnings])
@@ -198,7 +228,12 @@ def main():
     # 3. Post to X/Twitter as free marketing thread
     post_to_x_thread(brief)
     
-    # 4. Log
+    # 4. Save TradingView draft
+    tv_title = f"The Sunday Setup — Week of {week_of}"
+    tv_body = strip_html(brief)
+    save_tradingview_draft(tv_title, tv_body)
+    
+    # 5. Log
     log_sunday(
         now.strftime("%Y-%m-%d %H:%M"),
         week_of,
