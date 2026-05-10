@@ -11,6 +11,7 @@ AI-generated market intelligence. Zero humans. Delivered before the market opens
 | `delivery_log.csv` | Date, tier, type, subscriber count, status |
 | `signal_accuracy.csv` | Date, ticker, type, confluence score, sources, outcome |
 | `services/overnight_edge.py` | Daily brief generator (7:30 AM EST) |
+| `services/cast_daily.py` | CAST Report daily embed alerts (6:00 AM EST) |
 | `services/signal_synthesizer.py` | Real-time signal detection (market hours, every 30 min) |
 | `services/weekly_audit.py` | Weekly summary report (Sundays 12 PM EST) |
 | `services/subscribers.py` | CLI for adding/cancelling/listing subscribers |
@@ -50,6 +51,7 @@ npx vercel deploy --prod            # deploy
 | Service | Schedule | UTC | EST |
 |---------|----------|-----|-----|
 | Overnight Edge | `30 12 * * 1-5` | 12:30 | 7:30 AM |
+| CAST Daily | `0 10 * * 1-5` | 10:00 | 6:00 AM |
 | SignalSynthesizer | `*/30 14-20 * * 1-5` + `0 21 * * 1-5` | 14:30-21:00 | 9:30 AM - 4:00 PM |
 | Weekly Audit | `0 17 * * 0` | 17:00 | 12:00 PM |
 

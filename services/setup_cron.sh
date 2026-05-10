@@ -28,7 +28,10 @@ echo "*/30 12-23 * * * cd /mnt/user/overnight-edge && python3 services/predictio
 echo "0 0-1 * * * cd /mnt/user/overnight-edge && python3 services/prediction_pro.py >> /mnt/user/overnight-edge/services/pro.log 2>&1" >> "$CRON_FILE"
 echo "0 23 * * * cd /mnt/user/overnight-edge && python3 services/prediction_pro.py >> /mnt/user/overnight-edge/services/pro.log 2>&1" >> "$CRON_FILE"
 
-# 8. Weekly Audit — Sundays 12 PM EST (16:00 UTC)
+# 8. CAST Daily — 6:00 AM EST (10:00 UTC)
+echo "0 10 * * 1-5 cd /mnt/user/overnight-edge && python3 services/cast_daily.py >> /mnt/user/overnight-edge/services/cast.log 2>&1" >> "$CRON_FILE"
+
+# 9. Weekly Audit — Sundays 12 PM EST (16:00 UTC)
 echo "0 16 * * 0 cd /mnt/user/overnight-edge && python3 services/weekly_audit.py >> /mnt/user/overnight-edge/services/audit.log 2>&1" >> "$CRON_FILE"
 
 # Install
