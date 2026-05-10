@@ -10,7 +10,7 @@ TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
 
-LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_dark.jpeg"
+LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_dark.jpeg"
 DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
 LANDING_URL = "https://overnight-edge.onrender.com"
 

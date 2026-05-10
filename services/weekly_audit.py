@@ -6,7 +6,7 @@ import json
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
-LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_bot.png"
+LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
 
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"

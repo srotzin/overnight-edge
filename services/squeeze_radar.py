@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 PUBLIC_CHANNEL = "-1003828989254"
-LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_bot.png"
+LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
 
 X_BEARER = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
 

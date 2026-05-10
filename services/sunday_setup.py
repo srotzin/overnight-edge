@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
-LOGO_PATH = "/mnt/user/overnight-edge/cartoons/overnight_logo_bot.png"
+LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
 DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
 LANDING_URL = "https://overnight-edge.onrender.com"
 
