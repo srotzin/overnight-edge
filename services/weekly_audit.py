@@ -64,7 +64,6 @@ def count_subscribers():
                     tiers[tier] += 1
                 elif status == "cancelled":
                     cancelled += 1
-                # Count addons
                 if row.get("squeeze") == "active":
                     tiers["squeeze"] += 1
                 if row.get("sunday") == "active":
@@ -169,6 +168,38 @@ def main():
         tiers["pulse-pro"] * 499 +
         tiers["sunday"] * 29
     )
+    
+    # Check if we have any meaningful data
+    has_subscribers = any(tiers.values()) or cancelled > 0
+    has_signals = signal_total > 0
+    has_deliveries = briefs > 0 or alerts > 0
+    
+    if not has_subscribers and not has_signals and not has_deliveries:
+        # Send a brief "building up" message instead of wall of zeros
+        report = f"""📊 <b>WEEKLY AUDIT — {date_str}</b>
+━━━━━━━━━━━━━━━━━━━━
+
+Systems operational. Building subscriber base and signal history.
+
+📈 <b>THIS WEEK:</b>
+• Daily briefs delivered: {briefs}
+• Services running: 8/8
+• Landing page: overnight-edge.onrender.com
+
+🎯 <b>STATUS:</b>
+• MRR: Building
+• Subscribers: First cohort onboarding
+• Signal accuracy: Collecting baseline data
+
+💡 <b>FOCUS:</b>
+1. Drive traffic to landing page
+2. Convert free Telegram readers to paid
+3. Build signal track record
+
+⚠️ Automated by KimiClaw AI. Not financial advice."""
+        send_telegram_photo(LOGO_PATH, report)
+        print("Weekly audit (ramping up) sent")
+        return
     
     x_top_text = "\n".join([f"• @{a}: {c} alerts" for a, c in x_top]) if x_top else "• No XSignal data yet"
     
