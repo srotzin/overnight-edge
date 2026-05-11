@@ -313,7 +313,8 @@ def fetch_market_news() -> list:
 
 
 def fetch_earnings_today() -> list:
-    """Fetch today's earnings from Yahoo Finance"""
+    """Fetch today's earnings from multiple sources"""
+    # Try Yahoo Finance first
     try:
         url = "https://query1.finance.yahoo.com/v1/finance/calendar/earnings?formatted=false&lang=en-US&region=US&start=0&count=5&corsDomain=finance.yahoo.com"
         req = urllib.request.Request(url, headers={
@@ -324,16 +325,50 @@ def fetch_earnings_today() -> list:
         earnings_raw = data.get("finance", {}).get("result", [{}])[0].get("quotes", [])[:3]
         return [f"{q.get('symbol', '')} ({q.get('epsEstimate', 'TBD')} EPS est.)" for q in earnings_raw if q.get("symbol")]
     except Exception as e:
-        print(f"Earnings fetch failed: {e}")
-        return ["Earnings data updating..."]
+        print(f"Yahoo earnings fetch failed: {e}")
+    
+    # Fallback: Try MarketWatch earnings calendar (scrape)
+    try:
+        url = "https://www.marketwatch.com/tools/earnings"
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        })
+        response = urllib.request.urlopen(req, timeout=15)
+        html = response.read().decode('utf-8', errors='ignore')
+        # Extract ticker symbols from earnings table
+        tickers = re.findall(r'data-ticker="([A-Z]+)"', html)[:3]
+        if tickers:
+            return [f"{t} (Earnings today)" for t in tickers]
+    except Exception as e:
+        print(f"MarketWatch earnings fallback failed: {e}")
+    
+    # Final fallback: return placeholder
+    return ["Earnings data temporarily unavailable — check after market open"]
 
 
 def fetch_economic_calendar() -> list:
-    """Fetch today's economic events"""
+    """Fetch today's economic events from multiple sources"""
     weekday = datetime.now(timezone.utc).weekday()
     events = []
-    if weekday < 5:
+    
+    # Try ForexFactory economic calendar
+    try:
+        url = "https://www.forexfactory.com/calendar"
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        })
+        response = urllib.request.urlopen(req, timeout=15)
+        html = response.read().decode('utf-8', errors='ignore')
+        # Look for high-impact events today
+        high_impact = re.findall(r'calendar__event-title[^"]*">([^<]+)', html)
+        if high_impact:
+            events.extend([f"📊 {e.strip()}" for e in high_impact[:2] if e.strip()])
+    except Exception as e:
+        print(f"ForexFactory fetch failed: {e}")
+    
+    if weekday < 5 and not events:
         events.append("Pre-market economic data check active")
+    
     return events if events else ["No major economic events scheduled"]
 
 
