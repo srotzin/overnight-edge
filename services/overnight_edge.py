@@ -80,6 +80,36 @@ WILDCARD_MARKETS = [
     {"q": "Will Treasury yields close above 4.5%?", "o": "CME: 44%", "s": "CME Event Contracts"},
 ]
 
+# Quotes from global leaders for market/financial context
+GLOBAL_LEADER_QUOTES = [
+    {"text": "The market can stay irrational longer than you can stay solvent.", "author": "John Maynard Keynes"},
+    {"text": "In the short run, the market is a voting machine. In the long run, it's a weighing machine.", "author": "Benjamin Graham"},
+    {"text": "Be fearful when others are greedy, and greedy when others are fearful.", "author": "Warren Buffett"},
+    {"text": "The four most dangerous words in investing are: 'this time it's different'.", "author": "John Templeton"},
+    {"text": "Risk comes from not knowing what you're doing.", "author": "Warren Buffett"},
+    {"text": "The stock market is filled with individuals who know the price of everything, but the value of nothing.", "author": "Philip Fisher"},
+    {"text": "In investing, what is comfortable is rarely profitable.", "author": "Robert Arnott"},
+    {"text": "The individual investor should act consistently as an investor and not as a speculator.", "author": "Ben Graham"},
+    {"text": "Know what you own, and know why you own it.", "author": "Peter Lynch"},
+    {"text": "Cash is king in a crisis.", "author": "Ray Dalio"},
+    {"text": "Don't look for the needle in the haystack. Just buy the haystack.", "author": "John Bogle"},
+    {"text": "Price is what you pay. Value is what you get.", "author": "Warren Buffett"},
+]
+
+# Candace Owens quotes for cultural/political edge
+CANDACE_QUOTES = [
+    {"text": "The most powerful thing you can do is think for yourself.", "author": "Candace Owens"},
+    {"text": "I don't care about your feelings. I care about facts.", "author": "Candace Owens"},
+    {"text": "The goal is to get people to stop being victims and start being victors.", "author": "Candace Owens"},
+    {"text": "Truth is not mean. It's truth.", "author": "Candace Owens"},
+    {"text": "You don't have to be a product of your environment. You can be a product of your imagination.", "author": "Candace Owens"},
+    {"text": "The only way to fail is to quit.", "author": "Candace Owens"},
+    {"text": "Success is the best revenge.", "author": "Candace Owens"},
+    {"text": "The media is not here to inform you. It's here to condition you.", "author": "Candace Owens"},
+    {"text": "Stop asking for permission to be great.", "author": "Candace Owens"},
+    {"text": "You were not born to be average.", "author": "Candace Owens"},
+]
+
 CREATIVE_FALLBACKS = [
     "The feeds are quiet. The algos are listening. Something's being priced in.",
     "Wall Street's morning read hasn't dropped yet. The silence is data.",
@@ -495,6 +525,54 @@ def fetch_x_headlines() -> list:
     return headlines
 
 
+def fetch_x_scraped() -> list:
+    """Try to scrape X profiles using alternative frontends"""
+    headlines = []
+    
+    # Try nitter instances (X alternative frontends)
+    nitter_instances = [
+        "https://nitter.cz",
+        "https://nitter.net",
+        "https://nitter.privacydev.net",
+        "https://nitter.it",
+        "https://nitter.poast.org",
+        "https://nitter.unixfox.eu",
+        "https://nitter.fdn.fr"
+    ]
+    
+    for account in X_ACCOUNTS:
+        for instance in nitter_instances:
+            try:
+                url = f"{instance}/{account['username']}"
+                req = urllib.request.Request(
+                    url,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                    timeout=10
+                )
+                response = urllib.request.urlopen(req, timeout=15)
+                html = response.read().decode('utf-8', errors='ignore')
+                
+                # Extract tweet text from nitter HTML
+                # Nitter uses different HTML structures - try multiple patterns
+                tweet_matches = re.findall(r'<div class="tweet-content[^"]*">.*?<div class="tweet-body[^"]*">.*?<div[^>]*>([^<]+)</div>', html, re.DOTALL)
+                
+                if not tweet_matches:
+                    # Alternative pattern for newer nitter versions
+                    tweet_matches = re.findall(r'<div class="tweet-content"[^>]*>.*?<div class="tweet-text"[^>]*>(.*?)</div>', html, re.DOTALL)
+                
+                for match in tweet_matches[:2]:
+                    text = re.sub(r'<[^>]+>', '', match).strip()
+                    text = re.sub(r'\s+', ' ', text)
+                    # Filter out short or garbage text
+                    if text and len(text) > 30 and not text.startswith('http'):
+                        headlines.append(f"🐦 @{account['username']}: {text[:120]}")
+                        break
+            except Exception:
+                continue
+    
+    return headlines
+
+
 def fetch_all_headlines() -> list:
     """Fetch headlines from all available sources and mix them"""
     all_headlines = []
@@ -503,11 +581,23 @@ def fetch_all_headlines() -> list:
     x_headlines = fetch_x_headlines()
     all_headlines.extend(x_headlines)
     
-    # Source 2: Yahoo Finance RSS (always works, free)
+    # Source 2: Web scrape X profiles (nitter / alternative)
+    if not x_headlines:
+        scraped = fetch_x_scraped()
+        all_headlines.extend(scraped)
+    
+    # Source 3: Global leader quotes + Candace Owens (always available)
+    if not all_headlines:
+        leader_quote = random.choice(GLOBAL_LEADER_QUOTES)
+        candace_quote = random.choice(CANDACE_QUOTES)
+        all_headlines.append(f"💡 {leader_quote['text']} — {leader_quote['author']}")
+        all_headlines.append(f"🔥 {candace_quote['text']} — {candace_quote['author']}")
+    
+    # Source 4: Yahoo Finance RSS (always works, free)
     yahoo_headlines = fetch_yahoo_headlines()
     all_headlines.extend(yahoo_headlines)
     
-    # If we have no headlines at all, use creative fallback
+    # If we still have no headlines, use creative fallback
     if not all_headlines:
         all_headlines.append(random.choice(CREATIVE_FALLBACKS))
     
@@ -541,21 +631,25 @@ def generate_cast_cross_promo():
 # ===== BRIEF GENERATION WITH PERSONALITY =====
 
 def generate_trending_section(headlines: list) -> str:
-    """Format X headlines with creative flair"""
+    """Format headlines with creative flair - handles X posts, news, and quotes"""
     if not headlines:
         return ""
     
-    # If it's a creative fallback (single item, no @ symbol)
-    if len(headlines) == 1 and not headlines[0].startswith("@"):
+    # If it's a creative fallback (single item, no prefix)
+    if len(headlines) == 1 and not any(headlines[0].startswith(p) for p in ["🐦", "📰", "💡", "🔥"]):
         return f"""📢 <b>MARKET WHISPERS</b>
 {headlines[0]}"""
     
-    lines = ["🔥 <b>TRENDING ON X</b>"]
-    for h in headlines[:3]:
-        if h.startswith("@"):
+    lines = ["🔥 <b>TRENDING NOW</b>"]
+    for h in headlines[:4]:
+        if h.startswith("🐦"):
             lines.append(f"• {h}")
         elif h.startswith("📰"):
             lines.append(f"• {h}")
+        elif h.startswith("💡"):
+            lines.append(f"• <i>{h[2:]}</i>")
+        elif h.startswith("🔥"):
+            lines.append(f"• <i>{h[2:]}</i>")
         else:
             lines.append(f"• {h}")
     return "\n".join(lines)
