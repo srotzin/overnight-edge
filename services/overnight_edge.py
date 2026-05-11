@@ -415,6 +415,10 @@ def generate_full_brief(data: dict, headlines: list) -> str:
     subscription = generate_subscription_footer()
     cast_promo = generate_cast_cross_promo()
     
+    earnings_text = "\n".join(data['earnings'])
+    economic_text = "\n".join(data['economic'])
+    news_text = "\n".join(data['news'])
+    
     return f"""🌅 <b>DAILY DIGEST — {data['date']}</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>FUTURES:</b> S&P {data['sp_futures']}, Nasdaq {data['nasdaq_futures']}
@@ -427,13 +431,13 @@ def generate_full_brief(data: dict, headlines: list) -> str:
 {losers_text}
 
 📢 <b>EARNINGS:</b>
-{"\n".join(data['earnings'])}
+{earnings_text}
 
 📰 <b>ECONOMIC:</b>
-{"\n".join(data['economic'])}
+{economic_text}
 
 ⚡ <b>NEWS:</b>
-{"\n".join(data['news'])}
+{news_text}
 
 🔮 <b>OUTLOOK:</b> {data['outlook']}
 
