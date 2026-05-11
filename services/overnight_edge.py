@@ -112,8 +112,15 @@ def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
 
 
 def send_telegram_photo(photo_path: str, caption: str, chat_id: str = PUBLIC_CHANNEL):
+    """Send photo with caption. Truncates if caption > 1024 chars (Telegram limit)."""
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
     boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
+    
+    # Telegram photo caption limit is 1024 characters
+    max_caption = 1000
+    if len(caption) > max_caption:
+        caption = caption[:max_caption-3] + "..."
+    
     with open(photo_path, "rb") as f:
         photo_data = f.read()
     body = []
@@ -657,7 +664,15 @@ def main():
     # 1. Post FREE PREVIEW to public channel
     preview = generate_free_preview(data, headlines)
     if os.path.exists(LOGO_PATH):
-        preview_sent = send_telegram_photo(LOGO_PATH, preview, PUBLIC_CHANNEL)
+        # Send photo with truncated teaser caption, then full text
+        teaser = preview[:900] + "...\n\n📡 Full brief → overnight-edge.onrender.com"
+        photo_sent = send_telegram_photo(LOGO_PATH, teaser, PUBLIC_CHANNEL)
+        if photo_sent:
+            # Send full text as follow-up
+            preview_sent = send_telegram(preview, PUBLIC_CHANNEL)
+        else:
+            # Photo failed, send full text only
+            preview_sent = send_telegram(preview, PUBLIC_CHANNEL)
     else:
         preview_sent = send_telegram(preview, PUBLIC_CHANNEL)
     log_delivery(date_str, "public", "preview", 1, "delivered" if preview_sent else "failed")
