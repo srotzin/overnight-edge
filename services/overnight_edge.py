@@ -430,16 +430,33 @@ def get_spicy_take(sp_change, vix_value):
         return random.choice(SPICY_TAKES)
 
 
-# ===== X HEADLINE FETCHING WITH MULTIPLE FALLBACKS =====
+# ===== MULTI-SOURCE HEADLINE FETCHING =====
+
+def fetch_yahoo_headlines() -> list:
+    """Fetch financial news from Yahoo Finance RSS"""
+    try:
+        url = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC,%5EVIX,GC=F,CL=F,BTC-USD,ETH-USD"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = urllib.request.urlopen(req, timeout=10)
+        root = ET.fromstring(response.read())
+        items = root.findall('.//item')[:5]
+        headlines = []
+        for item in items:
+            title = item.find('title')
+            if title is not None and title.text:
+                headlines.append(f"📰 {title.text.strip()}")
+        return headlines
+    except Exception as e:
+        print(f"Yahoo headlines fetch failed: {e}")
+        return []
+
 
 def fetch_x_headlines() -> list:
-    """Fetch trending headlines with multiple fallback strategies."""
+    """Fetch latest posts from X accounts using API v2 (requires Basic+ tier)"""
     headlines = []
     
-    # Strategy 1: Try X API v2 user timeline (App-only auth may work for public accounts)
     for account in X_ACCOUNTS:
         try:
-            # Get user ID first
             lookup_url = f"https://api.twitter.com/2/users/by/username/{account['username']}"
             req = urllib.request.Request(
                 lookup_url,
@@ -453,7 +470,6 @@ def fetch_x_headlines() -> list:
             user_id = user_data.get("data", {}).get("id")
             
             if user_id:
-                # Get recent tweets (non-retweets, non-replies)
                 tweets_url = f"https://api.twitter.com/2/users/{user_id}/tweets?max_results=5&tweet.fields=created_at,public_metrics&exclude=replies,retweets"
                 req2 = urllib.request.Request(
                     tweets_url,
@@ -470,66 +486,33 @@ def fetch_x_headlines() -> list:
                     if text and not text.startswith("RT @"):
                         if len(text) > 120:
                             text = text[:117] + "..."
-                        headlines.append(f"@{account['username']}: {text}")
+                        headlines.append(f"🐦 @{account['username']}: {text}")
                         break
         except Exception as e:
-            print(f"X API v2 user timeline failed for {account['username']}: {e}")
+            print(f"X API failed for {account['username']}: {e}")
             continue
     
-    # Strategy 2: Try nitter instances
-    if not headlines:
-        nitter_instances = [
-            "https://nitter.cz",
-            "https://nitter.net",
-            "https://nitter.privacydev.net",
-            "https://nitter.it",
-            "https://nitter.poast.org"
-        ]
-        
-        for account in X_ACCOUNTS:
-            for instance in nitter_instances:
-                try:
-                    url = f"{instance}/{account['username']}"
-                    req = urllib.request.Request(
-                        url,
-                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-                        timeout=10
-                    )
-                    response = urllib.request.urlopen(req, timeout=15)
-                    html = response.read().decode('utf-8', errors='ignore')
-                    
-                    # Extract tweet text from nitter HTML
-                    tweet_matches = re.findall(r'<div class="tweet-content[^"]*">.*?<div class="tweet-body[^"]*">.*?<div[^>]*>([^<]+)</div>', html, re.DOTALL)
-                    
-                    for match in tweet_matches[:2]:
-                        text = re.sub(r'<[^>]+>', '', match).strip()
-                        text = re.sub(r'\s+', ' ', text)
-                        if text and len(text) > 20:
-                            headlines.append(f"@{account['username']}: {text[:120]}")
-                            break
-                except Exception:
-                    continue
+    return headlines
+
+
+def fetch_all_headlines() -> list:
+    """Fetch headlines from all available sources and mix them"""
+    all_headlines = []
     
-    # Strategy 3: Yahoo Finance news as creative fallback
-    if not headlines:
-        try:
-            news_url = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC,%5EVIX,GC=F,CL=F,BTC-USD,ETH-USD"
-            req = urllib.request.Request(news_url, headers={"User-Agent": "Mozilla/5.0"})
-            response = urllib.request.urlopen(req, timeout=10)
-            root = ET.fromstring(response.read())
-            items = root.findall('.//item')[:5]
-            for item in items:
-                title = item.find('title')
-                if title is not None and title.text:
-                    headlines.append(f"📰 {title.text.strip()}")
-        except Exception as e:
-            print(f"Yahoo news fallback failed: {e}")
+    # Source 1: X API (if user has Basic+ tier)
+    x_headlines = fetch_x_headlines()
+    all_headlines.extend(x_headlines)
     
-    # Strategy 4: Creative fallback when all sources fail
-    if not headlines:
-        headlines.append(random.choice(CREATIVE_FALLBACKS))
+    # Source 2: Yahoo Finance RSS (always works, free)
+    yahoo_headlines = fetch_yahoo_headlines()
+    all_headlines.extend(yahoo_headlines)
     
-    return headlines[:5]
+    # If we have no headlines at all, use creative fallback
+    if not all_headlines:
+        all_headlines.append(random.choice(CREATIVE_FALLBACKS))
+    
+    # Return up to 5, mixed from sources
+    return all_headlines[:5]
 
 
 # ===== SUBSCRIPTION AND PROMO FOOTERS =====
@@ -691,9 +674,9 @@ def main():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
     
-    # Fetch X headlines
-    print("Fetching X headlines...")
-    headlines = fetch_x_headlines()
+    # Fetch headlines from all sources
+    print("Fetching headlines...")
+    headlines = fetch_all_headlines()
     print(f"Fetched {len(headlines)} headlines")
     
     # 1. Post FREE PREVIEW to public channel
