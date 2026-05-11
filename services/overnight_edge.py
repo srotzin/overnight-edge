@@ -18,7 +18,7 @@ DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
 LANDING_URL = "https://overnight-edge.onrender.com"
 
 # X API Bearer Token (user provided)
-X_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3D"
+X_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
 
 STRIPE_PRODUCTS = {
     "daily_digest": "prod_UTd168i0Iw8b3M",
