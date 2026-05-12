@@ -187,33 +187,18 @@ def generate_brief():
     
     outlook = f"CPI on Wednesday is the week\u0027s headline risk. With consensus at +3.4% YoY, any deviation above 3.6% could reignite Treasury volatility and pressure rate-sensitive sectors. Semiconductor earnings (NVDA, AMD) midweek will set tone for AI trade. Energy names have a potential catalyst Tuesday. Keep position sizes tight ahead of CPI — this is a week where being directionally wrong is expensive."
     
-    brief = f"""📅 <b>THE SUNDAY SETUP — WEEK OF {week_of}</b>
-━━━━━━━━━━━━━━━━━━━━
-
-<b>📆 ECONOMIC CALENDAR:</b>
-{cal_lines}
-
-<b>🏆 TOP EARNINGS:</b>
-{earn_lines}
-
-<b>🌍 GEOPOLITICAL WATCH:</b>
-{geo}
-
-<b>📊 OPTIONS EXPIRATION:</b>
-{options}
-
-<b>🔮 WHAT THE SIGNALS SAY:</b>
-{signals}
-
-<b>📈 WEEK AHEAD OUTLOOK:</b>
-{outlook}
-
-⚠️ NOT FINANCIAL ADVICE
-
-━━━━━━━━━━━━━━━━━━━━
-<b>Get real-time alerts all week →</b> overnight-edge.vercel.app"""
+    # Use redesigned template with "THIS WEEK ON OVERNIGHT EDGE" teasers
+    brief = generate_sunday_setup_report(
+        week_of=week_of,
+        economic_calendar=economic,
+        top_earnings=earnings,
+        geopolitical=geo,
+        options_exp=options,
+        signals_syn=signals,
+        week_outlook=outlook
+    )
     
-    return brief, week_of, cal_lines, earn_lines, geo, options, signals, outlook
+    return brief, week_of, economic, earnings, geo, options, signals, outlook
 
 def post_to_x_thread(brief_text):
     """Post the Sunday Setup to X/Twitter as a thread"""
