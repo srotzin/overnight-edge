@@ -4,11 +4,22 @@ import json
 import urllib.request
 from datetime import datetime, timezone
 
+# Import redesigned template
+from signal_synthesizer_redesign import generate_signal_synthesizer_report, get_signal_synthesizer_footer, confluence_badge
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
 
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_dark.jpeg"
+LANDING_URL = "https://overnight-edge.vercel.app"
+
+# Signal Synthesizer Buy Button ID
+SS_BUY_BUTTON = "buy_btn_1TWLrSGrDuTtAB3muePQIrWx"
+
+# Unique voice: insider, smart-money, institutional
+# Content boundaries: ONLY congressional trades, SEC Form 4, unusual options flow, dark pool prints
+# NO futures, NO prediction markets, NO short squeeze, NO X sentiment
 
 def send_telegram(text: str, chat_id: str = PUBLIC_CHANNEL):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -87,26 +98,35 @@ def get_subscribers(tier_filter=None):
     return subs
 
 def generate_public_teaser(ticker, signal_type, score, direction, detail):
-    return f"""🚨 <b>SIGNAL DETECTED — {ticker}</b>
+    """Public teaser using redesigned Signal Synthesizer voice"""
+    badge = confluence_badge(score)
+    urgency = "🚨" if score >= 4 else "⚡"
+    
+    return f"""{urgency} <b>SIGNAL SYNTHESIZER — {ticker}</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>TYPE:</b> {signal_type}
-🎯 <b>CONFLUENCE:</b> {score}/5
+{badge}
 📈 <b>DIRECTION:</b> {direction}
 💰 <b>DETAIL:</b> {detail[:80]}...
 
-Full signal + all sources + confluence analysis →
-<a href="https://overnight-edge.vercel.app">overnight-edge.vercel.app</a>"""
+<b>Follow the smart money →</b>
+<a href="{LANDING_URL}">Signal Synthesizer — $149/mo</a>
+<b>See all tiers →</b>
+<a href="{LANDING_URL}">overnight-edge.vercel.app</a>"""
 
 def generate_full_alert(signal):
-    return f"""🚨 <b>SIGNALSYNTHESIZER — {signal['ticker']}</b>
-━━━━━━━━━━━━━━━━━━━━
-📊 <b>TYPE:</b> {signal['type']}
-🎯 <b>CONFLUENCE:</b> {signal['score']}/5
-📈 <b>DIRECTION:</b> {signal['direction']}
-💰 <b>DETAIL:</b> {signal['detail']}
-🔗 <b>SOURCES:</b> {', '.join(signal['sources'])}
-⏰ <b>TIME:</b> {signal['time']}
-⚠️ NOT FINANCIAL ADVICE"""
+    """Full alert using redesigned Signal Synthesizer template"""
+    # Convert to the format expected by the redesign template
+    signals_list = [{
+        "ticker": signal.get("ticker", "UNKNOWN"),
+        "signal_type": signal.get("type", "unknown"),
+        "score": signal.get("score", 0),
+        "details": signal.get("detail", ""),
+        "urgency": "high" if signal.get("score", 0) >= 4 else "medium" if signal.get("score", 0) >= 3 else "normal"
+    }]
+    
+    return generate_signal_synthesizer_report(signals_list)
+
 
 def generate_signals():
     now = datetime.now(timezone.utc)
