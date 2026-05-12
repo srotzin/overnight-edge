@@ -16,8 +16,15 @@ try:
 except ImportError:
     HAS_PANDAS = False
 
-TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
-ADMIN_CHAT = "5975342168"
+# CAST Report uses its OWN Telegram bot — separate from Overnight Edge
+CAST_TELEGRAM_TOKEN = os.environ.get("CAST_TELEGRAM_TOKEN", "")
+CAST_ADMIN_CHAT = os.environ.get("CAST_ADMIN_CHAT", "")
+CAST_PUBLIC_CHANNEL = os.environ.get("CAST_PUBLIC_CHANNEL", "")
+
+# Fallback to Overnight Edge bot if CAST bot not configured (migration period)
+TELEGRAM_TOKEN = CAST_TELEGRAM_TOKEN if CAST_TELEGRAM_TOKEN else "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
+ADMIN_CHAT = CAST_ADMIN_CHAT if CAST_ADMIN_CHAT else "5975342168"
+PUBLIC_CHANNEL = CAST_PUBLIC_CHANNEL if CAST_PUBLIC_CHANNEL else "-1003828989254"
 
 CAST_INGEST_API = "https://pourpulse-v2-idy4zhor7-hivecivilization.vercel.app/api/embeds/ingest"
 CAST_WEBHOOK_SECRET = os.environ.get("CAST_WEBHOOK_SECRET", "")
