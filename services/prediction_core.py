@@ -81,9 +81,17 @@ def fetch_polymarket_data():
         markets_raw = data if isinstance(data, list) else data.get("markets", [])
         markets = []
         for m in markets_raw[:10]:
+            # Polymarket API changed: probability is now in outcomePrices JSON string
+            prob = 0.5
+            try:
+                prices = json.loads(m.get("outcomePrices", "[0.5, 0.5]"))
+                if isinstance(prices, list) and len(prices) > 0:
+                    prob = float(prices[0])
+            except (json.JSONDecodeError, ValueError, TypeError):
+                prob = 0.5
             markets.append({
                 "title": m.get("question", "Unknown"),
-                "probability": m.get("probability", 0.5),
+                "probability": prob,
                 "volume": m.get("volume", 0),
                 "url": f"https://polymarket.com/event/{m.get('slug', '')}"
             })
