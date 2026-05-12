@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 import time
 
 # Import redesigned template
-from xsignal_redesign import generate_x20_report, get_xsignal_footer, signal_to_emoji, keyword_confluence_line
+from xsignal_redesign import generate_x20_report, get_x20_footer, signal_to_emoji, keyword_confluence_line
 
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
