@@ -7,6 +7,9 @@ from datetime import datetime, timezone
 import sys
 import glob
 
+# Import redesigned template
+from cast_redesign import generate_cast_report, get_cast_footer, embed_context
+
 try:
     import pandas as pd
     HAS_PANDAS = True
@@ -19,6 +22,11 @@ ADMIN_CHAT = "5975342168"
 CAST_INGEST_API = "https://pourpulse-v2-idy4zhor7-hivecivilization.vercel.app/api/embeds/ingest"
 CAST_WEBHOOK_SECRET = os.environ.get("CAST_WEBHOOK_SECRET", "")
 LANDING_URL = "https://castreport.com"
+
+# CAST Report is a separate product — drives to castreport.com
+# Unique voice: construction industry professional, supply-chain focused
+# Content boundaries: ONLY construction data, embed tables, housing permits, lumber futures, Simpson Strong-Tie embed data
+# NO equity market data, NO prediction markets, NO X sentiment
 
 CAST_STRIPE_PRICES = {
     "monthly_pulse": "price_1TVDdEGrDuTtAB3meaYcvbs7",
