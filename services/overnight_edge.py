@@ -21,14 +21,14 @@ LANDING_URL = "https://overnight-edge.vercel.app"
 X_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAALko9gEAAAAAVO21s1OTPi8uVRFse%2FDNOwRqILg%3DWfNO8ZpZnA83KuUo2MBnbf3rD02YmhSMR3Yq0tqBEPgynG9nnS zapH2hsZ64upxIHXjpvBlTAMOd354L7lFdmX2FkeXBIl8MWZDW T82mNIQqtt8efmAdj5nrMjFWc"
 
 STRIPE_PRODUCTS = {
-    "daily_digest": "prod_UTd168i0Iw8b3M",
-    "signal_synthesizer": "prod_UTd2L2yQEam5Cl",
-    "short_squeeze_radar": "prod_UTnEW457mr8e8Y",
-    "sunday_setup": "prod_UTnDozUig2aYiV",
-    "x10_signal": "prod_UTmCN8WfEm86rk",
-    "prediction_core": "prod_UTmghR9ygJVPZb",
-    "x20_signal": "prod_UTmCJV925O2pvU",
-    "prediction_pro": "prod_UTmhMhmW6G3r4D",
+    "daily_digest": "price_1TUflNGrDuTtAB3m2VO3CNZD",
+    "signal_synthesizer": "price_1TUodrGrDuTtAB3mC6IAjCAh",
+    "short_squeeze_radar": "price_1TUpeIGrDuTtAB3mRo2iuYer",
+    "sunday_setup": "price_1TUpdRGrDuTtAB3mOrVdqXtS",
+    "x10_signal": "price_1TUodrGrDuTtAB3mC6IAjCAh",
+    "prediction_core": "price_1TUp7FGrDuTtAB3mttbr4INe",
+    "x20_signal": "price_1TUoeXGrDuTtAB3mhUikn1wC",
+    "prediction_pro": "price_1TUp7sGrDuTtAB3mGuRrnrb6",
 }
 
 X_ACCOUNTS = [

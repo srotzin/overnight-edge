@@ -11,3 +11,6 @@ date,tier,type,subscriber_count,status
 2026-05-11,public,preview,1,delivered
 2026-05-11,admin,brief,1,delivered
 2026-05-11,edge,brief,0,no_subscribers
+2026-05-12,public,preview,1,delivered
+2026-05-12,admin,brief,1,delivered
+2026-05-12,edge,brief,0,no_subscribers

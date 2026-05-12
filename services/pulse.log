@@ -76,3 +76,27 @@ Kalshi fetch error: HTTP Error 401: Unauthorized
 PredictionCore AFTERNOON SESSION sent to 0 pulse-core subscribers
 PredictionCore AFTERNOON SESSION sent to 0 pulse-pro subscribers
 PredictionCore complete
+Starting PredictionCore EVENING SESSION at 2026-05-12 04:00
+Kalshi fetch error: HTTP Error 401: Unauthorized
+Telegram photo send failed: HTTP Error 400: Bad Request
+PredictionCore EVENING SESSION sent to 0 pulse-core subscribers
+PredictionCore EVENING SESSION sent to 0 pulse-pro subscribers
+PredictionCore complete
+Starting PredictionCore MORNING SESSION at 2026-05-12 08:00
+Kalshi fetch error: HTTP Error 401: Unauthorized
+Telegram photo send failed: HTTP Error 400: Bad Request
+PredictionCore MORNING SESSION sent to 0 pulse-core subscribers
+PredictionCore MORNING SESSION sent to 0 pulse-pro subscribers
+PredictionCore complete
+Starting PredictionCore MIDDAY SESSION at 2026-05-12 12:00
+Kalshi fetch error: HTTP Error 401: Unauthorized
+Telegram photo send failed: HTTP Error 400: Bad Request
+PredictionCore MIDDAY SESSION sent to 0 pulse-core subscribers
+PredictionCore MIDDAY SESSION sent to 0 pulse-pro subscribers
+PredictionCore complete
+Starting PredictionCore AFTERNOON SESSION at 2026-05-12 16:00
+Kalshi fetch error: HTTP Error 401: Unauthorized
+Telegram photo send failed: HTTP Error 400: Bad Request
+PredictionCore AFTERNOON SESSION sent to 0 pulse-core subscribers
+PredictionCore AFTERNOON SESSION sent to 0 pulse-pro subscribers
+PredictionCore complete

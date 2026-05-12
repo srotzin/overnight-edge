@@ -1,3 +1,5 @@
+import StripeBuyButton from "./components/StripeBuyButton";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16 relative overflow-hidden">
@@ -39,17 +41,12 @@ export default function Home() {
             <div className="text-4xl font-bold mb-6">$49<span className="text-lg text-gray-400">/mo</span></div>
             <ul className="space-y-3 text-gray-300 mb-8 text-sm">
               <li>Pre-market brief every trading day 8:00 AM EST</li>
-              <li>S&P 500 / Nasdaq futures</li>
+              <li>S&amp;P 500 / Nasdaq futures</li>
               <li>VIX, gainers/losers</li>
               <li>Earnings, economic data</li>
               <li>Breaking news with sentiment</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTd168i0Iw8b3M"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLs4GrDuTtAB3mRdCm5bnZ" />
           </div>
 
           {/* Card 2 — Signal Synthesizer */}
@@ -65,12 +62,7 @@ export default function Home() {
               <li>Dark pool prints</li>
               <li>Confluence scoring 3/5 minimum</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTd2L2yQEam5Cl"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLrSGrDuTtAB3muePQIrWx" />
           </div>
 
           {/* Card 3 — Short Squeeze Radar */}
@@ -84,14 +76,9 @@ export default function Home() {
               <li>Low float + high days-to-cover</li>
               <li>Options gamma ramp detection</li>
               <li>Squeeze Score 1-10 (alerts on 6+)</li>
-              <li>Social volume & borrow utilization</li>
+              <li>Social volume &amp; borrow utilization</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTnEW457mr8e8Y"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLniGrDuTtAB3mojv83V6D" />
           </div>
 
           {/* Card 4 — X10 Signal */}
@@ -107,12 +94,7 @@ export default function Home() {
               <li>Every 30 min during market hours</li>
               <li>Confluence scoring on keyword matches</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTmCN8WfEm86rk"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLqtGrDuTtAB3m9vVOxud8" />
           </div>
 
           {/* Card 5 — X20 Signal */}
@@ -129,12 +111,7 @@ export default function Home() {
               <li>15-minute cadence</li>
               <li>Includes Short Squeeze Radar</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTmCJV925O2pvU"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLqAGrDuTtAB3mBu2MrOMW" />
           </div>
 
           {/* Card 6 — PredictionCore */}
@@ -150,12 +127,7 @@ export default function Home() {
               <li>Consensus probability + divergence alerts</li>
               <li>4x daily reports</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTmghR9ygJVPZb"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLpXGrDuTtAB3mzRewSdxs" />
           </div>
 
           {/* Card 7 — Prediction Pro */}
@@ -172,12 +144,7 @@ export default function Home() {
               <li>Custom watchlists (coming soon)</li>
               <li>Includes Short Squeeze Radar</li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTmhMhmW6G3r4D"
-              className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Subscribe
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLouGrDuTtAB3mhwdzodZK" />
           </div>
 
           {/* Card 8 — The Sunday Setup */}
@@ -198,12 +165,7 @@ export default function Home() {
               <li>Posted FREE on X/Twitter</li>
               <li><b>Included with every tier</b></li>
             </ul>
-            <a
-              href="https://buy.stripe.com/prod_UTnDozUig2aYiV"
-              className="block w-full text-center bg-[#00c853] text-black font-semibold py-3 rounded-lg hover:bg-[#00a844] transition-colors"
-            >
-              Subscribe to Any Tier
-            </a>
+            <StripeBuyButton buyButtonId="buy_btn_1TWLoJGrDuTtAB3mhroMpFAw" />
           </div>
         </div>
 
