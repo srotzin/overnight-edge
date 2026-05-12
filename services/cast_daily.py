@@ -14,16 +14,44 @@ CAST_INGEST_API = "https://pourpulse-v2-idy4zhor7-hivecivilization.vercel.app/ap
 CAST_WEBHOOK_SECRET = os.environ.get("CAST_WEBHOOK_SECRET", "")
 LANDING_URL = "https://castreport.com"
 
-CAST_STRIPE_PRODUCTS = {
-    "monthly_pulse": "prod_UUC1HzwveitnrZ",
-    "daily_brief": "prod_UUC1GgZLEud3rm",
-    "full_intelligence": "prod_UUC2hzOTsPzy8W",
-    "signals": "prod_UUCFaANoUCn74V",
-    "forecast": "prod_UUCGpERHomaut0",
-    "vision": "prod_UUCGr3O3aDcp8E",
-    "national": "prod_UUCG6tOPD5KxyJ",
-    "permitflow": "prod_UUCH7HfqHNhYdV",
+CAST_STRIPE_PRICES = {
+    "monthly_pulse": "price_1TVDdEGrDuTtAB3meaYcvbs7",
+    "daily_brief": "price_1TVDdcGrDuTtAB3mSV1cb9ok",
+    "full_intelligence": "price_1TVDeEGrDuTtAB3m3EItsKrE",
+    "signals": "price_1TVDrMGrDuTtAB3maPDuOQap",
+    "forecast": "price_1TVDrrGrDuTtAB3mG2idzI3V",
+    "vision": "price_1TVDsAGrDuTtAB3mJem4XcGr",
+    "national": "price_1TVDsPGrDuTtAB3mTn82XBnI",
+    "permitflow": "price_1TVDshGrDuTtAB3mKSDc6chZ",
 }
+
+CAST_STRIPE_SECRET = os.environ.get("CAST_STRIPE_SECRET", "")
+
+def create_cast_checkout_url(price_id: str) -> str:
+    """Create a Stripe Checkout session URL from a Price ID"""
+    if not CAST_STRIPE_SECRET:
+        # Fallback: direct payment link format (won't work without secret)
+        return f"https://buy.stripe.com/{price_id}"
+    try:
+        import urllib.request
+        url = "https://api.stripe.com/v1/checkout/sessions"
+        data = urllib.parse.urlencode({
+            "mode": "subscription",
+            "line_items[0][price]": price_id,
+            "line_items[0][quantity]": 1,
+            "success_url": "https://castreport.com/success",
+            "cancel_url": "https://castreport.com",
+        }).encode()
+        req = urllib.request.Request(url, data=data, headers={
+            "Authorization": f"Bearer {CAST_STRIPE_SECRET}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        })
+        resp = urllib.request.urlopen(req, timeout=30)
+        result = json.loads(resp.read())
+        return result.get("url", "https://castreport.com")
+    except Exception as e:
+        print(f"Stripe checkout error: {e}")
+        return "https://castreport.com"
 
 def send_telegram(text: str, chat_id: str = ADMIN_CHAT):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -102,19 +130,12 @@ def analyze_data(data: dict) -> dict:
     }
 
 def generate_subscription_footer():
+    # TODO: Replace with actual Stripe Payment Link URLs once created in dashboard
+    # Price IDs are backend identifiers, not clickable URLs
     return f"""━━━━━━━━━━━━━━━━━━━━
 🏗️ <b>SUBSCRIBE TO CAST REPORT</b>
 
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['monthly_pulse']}">Monthly Pulse — $799/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['daily_brief']}">Daily Brief — $1,899/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['full_intelligence']}">Full Intelligence — $3,499/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['signals']}">CAST Signals — $499/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['forecast']}">CAST Forecast — $299/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['vision']}">CAST Vision — $199/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['national']}">CAST National — $599/mo</a>
-<a href="https://buy.stripe.com/{CAST_STRIPE_PRODUCTS['permitflow']}">PermitFlow — $399/mo</a>
-
-🔓 <a href="{LANDING_URL}">Full Intelligence → castreport.com</a>"""
+<a href="https://castreport.com">CAST Report</a> — 90-day construction intelligence."""
 
 def generate_cast_alert(analysis: dict) -> str:
     now = datetime.now(timezone.utc)
