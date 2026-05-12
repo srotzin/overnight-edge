@@ -8,7 +8,7 @@ import sys
 import glob
 
 # Import redesigned template
-from cast_redesign import generate_cast_report, get_cast_footer, embed_context
+from cast_redesign import generate_cast_alert, get_cast_footer, embed_context
 
 try:
     import pandas as pd
