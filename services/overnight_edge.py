@@ -9,6 +9,9 @@ from datetime import datetime, timezone
 import sys
 import xml.etree.ElementTree as ET
 
+# Import redesigned template
+from daily_digest_redesign import generate_daily_digest_report, get_daily_digest_footer
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
@@ -37,95 +40,33 @@ X_ACCOUNTS = [
     {"handle": "Merlijn The Trader", "username": "MerlijnTrader"},
 ]
 
-# ===== CREATIVE CONTENT BANKS =====
-OPENINGS = [
-    "🌅 <b>THE OVERNIGHT EDGE</b>",
-    "☕ <b>GOOD MORNING</b> — The machines are awake.",
-    "⚡ <b>WHILE YOU SLEPT</b>",
-    "🎯 <b>MARKETS DON'T SLEEP</b>",
-    "🔥 <b>YOUR DAILY DOSE OF CONTRARIAN INTELLIGENCE</b>",
+# ===== DAILY DIGEST: UNIQUE CONTENT ONLY =====
+# Daily Digest focuses ONLY on: futures, VIX, pre-market movers, overnight news, earnings, economic data
+# NO prediction markets (goes to PredictionCore)
+# NO quotes (goes to PredictionCore)
+# NO X sentiment (goes to X10/X20)
+# NO congressional trades (goes to Signal Synthesizer)
+# NO short squeeze data (goes to Short Squeeze Radar)
+
+DD_OPENINGS = [
+    "🌅 <b>THE OVERNIGHT EDGE — DAILY DIGEST</b>",
+    "📈 <b>PRE-MARKET BRIEF</b>",
+    "☕ <b>WHILE YOU SLEPT</b>",
+    "🎯 <b>THE BELL APPROACHES</b>",
 ]
 
-VIBES = {
-    "fear": "🔥 <b>FEAR IS IN THE AIR.</b> Smart money is positioning.",
-    "nervous": "⚡ <b>NERVOUS ENERGY.</b> Something's brewing beneath the surface.",
-    "complacent": "😴 <b>COMPLACENT.</b> Too quiet for comfort.",
-    "euphoric": "🚨 <b>EUPHORIC.</b> Dangerously calm.",
-    "chaos": "🌪️ <b>CHAOS.</b> Volatility is the only certainty.",
-}
-
-SPICY_TAKES = [
-    "The rally has no conviction. Watch for reversals.",
-    "Capitulation or opportunity? History favors the brave.",
-    "The calm before. Something always follows the silence.",
-    "Blood in the streets. The institutional bid is waiting.",
-    "Green and cocky. Don't chase without volume.",
-    "Sideways grind. The market is deciding. Be patient.",
-    "Smart money is selling the rip. Check the flows.",
-    "Retail is panicking. Institutions are accumulating.",
-    "The narrative is shifting. Don't be the last to notice.",
-    "Low volume rally = low conviction. Trade accordingly.",
+DD_TAKES = [
+    "Futures are pricing in a tone shift. Watch the cash open for confirmation.",
+    "Overnight action suggests institutional repositioning. Volume will tell the truth.",
+    "The pre-market narrative is set. Now we see if the market agrees.",
+    "Quiet overnight = either confidence or complacency. The first 30 minutes decides.",
+    "Gap up on thin volume is a trap until proven otherwise.",
 ]
 
-WILDCARD_MARKETS = [
-    {"q": "Will Bitcoin close above $70k this week?", "o": "Polymarket: 62%", "s": "Polymarket"},
-    {"q": "Will the Fed mention 'patient' in next statement?", "o": "Kalshi: 78%", "s": "Kalshi"},
-    {"q": "Will Trump post before market open?", "o": "CME: 45%", "s": "CME Event Contracts"},
-    {"q": "Will Nvidia announce a split by June?", "o": "Kalshi: 34%", "s": "Kalshi"},
-    {"q": "Will VIX spike above 30 this month?", "o": "CME: 28%", "s": "CME Event Contracts"},
-    {"q": "Will S&P 500 hit all-time high this month?", "o": "Polymarket: 41%", "s": "Polymarket"},
-    {"q": "Will oil break $80 before Friday?", "o": "Kalshi: 52%", "s": "Kalshi"},
-    {"q": "Will Ethereum outperform Bitcoin this week?", "o": "Polymarket: 38%", "s": "Polymarket"},
-    {"q": "Will any Magnificent 7 stock drop >5% today?", "o": "Kalshi: 19%", "s": "Kalshi"},
-    {"q": "Will Treasury yields close above 4.5%?", "o": "CME: 44%", "s": "CME Event Contracts"},
-]
-
-# Quotes from global leaders for market/financial context
-GLOBAL_LEADER_QUOTES = [
-    {"text": "The market can stay irrational longer than you can stay solvent.", "author": "John Maynard Keynes"},
-    {"text": "In the short run, the market is a voting machine. In the long run, it's a weighing machine.", "author": "Benjamin Graham"},
-    {"text": "Be fearful when others are greedy, and greedy when others are fearful.", "author": "Warren Buffett"},
-    {"text": "The four most dangerous words in investing are: 'this time it's different'.", "author": "John Templeton"},
-    {"text": "Risk comes from not knowing what you're doing.", "author": "Warren Buffett"},
-    {"text": "The stock market is filled with individuals who know the price of everything, but the value of nothing.", "author": "Philip Fisher"},
-    {"text": "In investing, what is comfortable is rarely profitable.", "author": "Robert Arnott"},
-    {"text": "The individual investor should act consistently as an investor and not as a speculator.", "author": "Ben Graham"},
-    {"text": "Know what you own, and know why you own it.", "author": "Peter Lynch"},
-    {"text": "Cash is king in a crisis.", "author": "Ray Dalio"},
-    {"text": "Don't look for the needle in the haystack. Just buy the haystack.", "author": "John Bogle"},
-    {"text": "Price is what you pay. Value is what you get.", "author": "Warren Buffett"},
-]
-
-# Candace Owens quotes for cultural/political edge
-CANDACE_QUOTES = [
-    {"text": "The most powerful thing you can do is think for yourself.", "author": "Candace Owens"},
-    {"text": "I don't care about your feelings. I care about facts.", "author": "Candace Owens"},
-    {"text": "The goal is to get people to stop being victims and start being victors.", "author": "Candace Owens"},
-    {"text": "Truth is not mean. It's truth.", "author": "Candace Owens"},
-    {"text": "You don't have to be a product of your environment. You can be a product of your imagination.", "author": "Candace Owens"},
-    {"text": "The only way to fail is to quit.", "author": "Candace Owens"},
-    {"text": "Success is the best revenge.", "author": "Candace Owens"},
-    {"text": "The media is not here to inform you. It's here to condition you.", "author": "Candace Owens"},
-    {"text": "Stop asking for permission to be great.", "author": "Candace Owens"},
-    {"text": "You were not born to be average.", "author": "Candace Owens"},
-]
-
-CREATIVE_FALLBACKS = [
-    "The feeds are quiet. The algos are listening. Something's being priced in.",
-    "Wall Street's morning read hasn't dropped yet. The silence is data.",
-    "Crypto Twitter is unusually calm. Either very good, or very bad.",
-    "No major headlines yet. The market is trading on memory, not news.",
-    "The morning narrative is still forming. First headlines usually win.",
-    "The machines are running silent. Low noise often precedes high signal.",
-    "X is thin this morning. Macro traders are watching bonds, not tweets.",
-]
-
-CLOSINGS = [
-    "Not financial advice. Just better than yours.",
-    "See you at the bell.",
-    "The edge is yours. Use it.",
-    "Stay sharp. Stay liquid.",
-    "Markets open soon. Be ready.",
+DD_CLOSINGS = [
+    "This is your Daily Digest. The full trading day awaits.",
+    "See you at the open. Stay sharp.",
+    "Pre-market edge delivered. Now execute.",
 ]
 
 
@@ -628,139 +569,63 @@ def generate_cast_cross_promo():
 <a href="https://castreport.com">CAST Report</a> — 90-day construction intelligence."""
 
 
-# ===== BRIEF GENERATION WITH PERSONALITY =====
+# ===== REDESIGNED DAILY DIGEST BRIEF GENERATION =====
 
-def generate_trending_section(headlines: list) -> str:
-    """Format headlines with creative flair - handles X posts, news, and quotes"""
-    if not headlines:
-        return ""
+def generate_daily_digest_brief(data: dict, headlines: list, is_preview: bool = False) -> str:
+    """Generate Daily Digest using the redesigned template.
     
-    # If it's a creative fallback (single item, no prefix)
-    if len(headlines) == 1 and not any(headlines[0].startswith(p) for p in ["🐦", "📰", "💡", "🔥"]):
-        return f"""📢 <b>MARKET WHISPERS</b>
-{headlines[0]}"""
+    This is the ONLY product that delivers pre-market briefs.
+    NO prediction markets, NO quotes, NO X sentiment, NO congressional trades.
+    """
+    # Use redesigned template
+    report = generate_daily_digest_report(
+        sp_futures={"change_pct": data.get("raw_sp", 0)},
+        nq_futures={"change_pct": data.get("raw_nq", 0)},
+        vix_value=data.get("raw_vix", 20),
+        vix_change=0,  # Will be calculated separately
+        gainers=[{"symbol": g["ticker"], "change_pct": float(g["change"].replace("%", "").replace("+", ""))} for g in data.get("gainers", [])],
+        losers=[{"symbol": l["ticker"], "change_pct": float(l["change"].replace("%", "").replace("+", ""))} for l in data.get("losers", [])],
+        earnings=[{"ticker": e.split()[0] if e else "N/A", "eps": "N/A", "rev": "N/A"} for e in data.get("earnings", [])],
+        economic=[{"time": "Today", "event": e, "consensus": "N/A"} for e in data.get("economic", [])]
+    )
     
-    lines = ["🔥 <b>TRENDING NOW</b>"]
-    for h in headlines[:4]:
-        if h.startswith("🐦"):
-            lines.append(f"• {h}")
-        elif h.startswith("📰"):
-            lines.append(f"• {h}")
-        elif h.startswith("💡"):
-            lines.append(f"• <i>{h[2:]}</i>")
-        elif h.startswith("🔥"):
-            lines.append(f"• <i>{h[2:]}</i>")
-        else:
-            lines.append(f"• {h}")
-    return "\n".join(lines)
+    # For preview (public channel), truncate and add teaser
+    if is_preview:
+        # Truncate after the outlook section and add "see full brief" CTA
+        lines = report.split("\n")
+        preview_lines = []
+        for line in lines:
+            preview_lines.append(line)
+            if "💡 THE TAKE:" in line:
+                break
+        
+        preview = "\n".join(preview_lines)
+        preview += f"""
 
-
-def generate_free_preview(data: dict, headlines: list) -> str:
-    """Generate creative free preview for public channel"""
-    opening = random.choice(OPENINGS)
-    vibe_key = get_market_vibe(data.get("raw_vix", 20))
-    vibe = VIBES.get(vibe_key, VIBES["chaos"])
-    take = get_spicy_take(data.get("raw_sp", 0), data.get("raw_vix", 20))
-    wildcard = random.choice(WILDCARD_MARKETS)
-    x_section = generate_trending_section(headlines)
-    subscription = generate_subscription_footer()
-    cast_promo = generate_cast_cross_promo()
-    closing = random.choice(CLOSINGS)
+📡 <b>Get the full Daily Digest every morning →</b>
+<a href="{LANDING_URL}">Subscribe — $49/mo</a>"""
+        return preview
     
-    # Format preview with personality
-    preview = f"""{opening} — {data['date']}
-━━━━━━━━━━━━━━━━━━━━
-{vibe}
-
-📊 <b>FUTURES:</b> S&P {data['sp_futures']} | Nasdaq {data['nasdaq_futures']}
-📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})
-
-💡 <b>THE TAKE:</b> {take}
-
-🏆 <b>GAINER:</b> {data['gainers'][0]['ticker']} {data['gainers'][0]['change']}
-🔻 <b>LOSER:</b> {data['losers'][0]['ticker']} {data['losers'][0]['change']}
-
-📢 <b>EARNINGS:</b> {data['earnings'][0]}
-⚡ <b>NEWS:</b> {data['news'][0][:80]}...
-
-🔮 <b>OUTLOOK:</b> {data['outlook']}
-
-🎲 <b>WILDCARD:</b> {wildcard['q']}
-Odds: {wildcard['o']} ({wildcard['s']})
-
-{x_section}
-
-{subscription}
-
-{cast_promo}
-
-━━━━━━━━━━━━━━━━━━━━
-⚠️ {closing}
-
-Full brief + 10 more signals + earnings calendar →
-<a href="{LANDING_URL}">overnight-edge.vercel.app</a>"""
-    
-    return preview
+    return report
 
 
-def generate_full_brief(data: dict, headlines: list) -> str:
-    """Generate creative full brief for paid subscribers"""
-    opening = random.choice(OPENINGS)
-    vibe_key = get_market_vibe(data.get("raw_vix", 20))
-    vibe = VIBES.get(vibe_key, VIBES["chaos"])
-    take = get_spicy_take(data.get("raw_sp", 0), data.get("raw_vix", 20))
-    wildcard = random.choice(WILDCARD_MARKETS)
-    x_section = generate_trending_section(headlines)
-    subscription = generate_subscription_footer()
-    cast_promo = generate_cast_cross_promo()
-    closing = random.choice(CLOSINGS)
-    
-    # Pre-compute text blocks to avoid f-string backslash issues
-    gainers_text = "\n".join([f"  {g['ticker']} {g['change']}" for g in data['gainers']])
-    losers_text = "\n".join([f"  {l['ticker']} {l['change']}" for l in data['losers']])
-    earnings_text = "\n".join([f"  {e}" for e in data['earnings']])
-    economic_text = "\n".join([f"  {e}" for e in data['economic']])
-    news_text = "\n".join([f"  {n}" for n in data['news']])
-    
-    brief = f"""{opening} — {data['date']}
-━━━━━━━━━━━━━━━━━━━━
-{vibe}
+def generate_daily_digest_full(data: dict, headlines: list) -> str:
+    """Full Daily Digest for paid subscribers and admin."""
+    return generate_daily_digest_brief(data, headlines, is_preview=False)
 
-📊 <b>FUTURES:</b> S&P {data['sp_futures']} | Nasdaq {data['nasdaq_futures']}
-📈 <b>VIX:</b> {data['vix']} ({data['vix_change']})
 
-💡 <b>THE TAKE:</b> {take}
+# ===== LEGACY: REMOVE OLD FUNCTIONS =====
+# Old generate_free_preview and generate_full_brief removed.
+# They included prediction markets, quotes, and X sentiment that overlap with other products.
+# 
+# Content boundaries:
+# - Daily Digest: futures, VIX, pre-market movers, overnight news, earnings, economic data
+# - PredictionCore: prediction markets, quotes, crypto pulse
+# - X10/X20: X/Twitter signals
+# - Signal Synthesizer: congressional trades, insider filings, options flow
+# - Short Squeeze Radar: short interest, gamma ramp, squeeze scores
 
-🏆 <b>GAINERS:</b>
-{gainers_text}
 
-🔻 <b>LOSERS:</b>
-{losers_text}
-
-📢 <b>EARNINGS:</b>
-{earnings_text}
-
-📰 <b>ECONOMIC:</b>
-{economic_text}
-
-⚡ <b>NEWS:</b>
-{news_text}
-
-🔮 <b>OUTLOOK:</b> {data['outlook']}
-
-🎲 <b>WILDCARD:</b> {wildcard['q']}
-Odds: {wildcard['o']} ({wildcard['s']})
-
-{x_section}
-
-{subscription}
-
-{cast_promo}
-
-━━━━━━━━━━━━━━━━━━━━
-⚠️ {closing}"""
-    
-    return brief
 
 
 def main():
@@ -768,13 +633,13 @@ def main():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
     
-    # Fetch headlines from all sources
+    # Fetch headlines from all sources (Yahoo Finance news only for Daily Digest)
     print("Fetching headlines...")
-    headlines = fetch_all_headlines()
+    headlines = fetch_yahoo_headlines()  # Daily Digest only uses market news, NOT X sentiment
     print(f"Fetched {len(headlines)} headlines")
     
     # 1. Post FREE PREVIEW to public channel
-    preview = generate_free_preview(data, headlines)
+    preview = generate_daily_digest_brief(data, headlines, is_preview=True)
     if os.path.exists(LOGO_PATH):
         # Send photo with truncated teaser caption, then full text
         teaser = preview[:900] + "...\n\n📡 Full brief → overnight-edge.vercel.app"
@@ -791,7 +656,7 @@ def main():
     print(f"Free preview sent to public channel: {'OK' if preview_sent else 'FAIL'}")
     
     # 2. Post FULL BRIEF to admin
-    full_brief = generate_full_brief(data, headlines)
+    full_brief = generate_daily_digest_full(data, headlines)
     admin_sent = send_telegram(full_brief, ADMIN_CHAT)
     log_delivery(date_str, "admin", "brief", 1, "delivered" if admin_sent else "failed")
     print(f"Full brief sent to admin: {'OK' if admin_sent else 'FAIL'}")
