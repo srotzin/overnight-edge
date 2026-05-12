@@ -5,15 +5,31 @@ import urllib.request
 import re
 from datetime import datetime, timezone, timedelta
 
+# Import redesigned template
+from sunday_setup_redesign import generate_sunday_setup_report, get_sunday_setup_footer
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
 DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
 LANDING_URL = "https://overnight-edge.vercel.app"
 
+# Product Buy Button IDs for CTAs
+DD_BUY = "buy_btn_1TWLs4GrDuTtAB3mRdCm5bnZ"
+SS_BUY = "buy_btn_1TWLrSGrDuTtAB3muePQIrWx"
+SQR_BUY = "buy_btn_1TWLniGrDuTtAB3mojv83V6D"
+X10_BUY = "buy_btn_1TWLqtGrDuTtAB3m9vVOxud8"
+X20_BUY = "buy_btn_1TWLqAGrDuTtAB3mBu2MrOMW"
+PC_BUY = "buy_btn_1TWLpXGrDuTtAB3mzRewSdxs"
+PP_BUY = "buy_btn_1TWLouGrDuTtAB3mhwdzodZK"
+
 X_BEARER = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
 X_CLIENT_ID = "RFd5RTctLThrb1o2bFQ5US11cno6MTpjaQ"
 X_CLIENT_SECRET = "BlpbjNtEL9BR7YiXdl9CQ3utKaNI1dL0XszACo0J_5duSTg2PO"
+
+# Unique voice: editorial, strategic, week-ahead focused
+# Purpose: FREE marketing piece that converts readers to paid subscribers
+# Includes: "THIS WEEK ON OVERNIGHT EDGE" section teasing each paid tier
 
 def send_telegram(text, chat_id=ADMIN_CHAT):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
