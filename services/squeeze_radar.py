@@ -4,12 +4,24 @@ import json
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
+# Import redesigned template
+from squeeze_radar_redesign import generate_squeeze_radar_report, get_squeeze_radar_footer, squeeze_score_visual, risk_context
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 PUBLIC_CHANNEL = "-1003828989254"
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
+LANDING_URL = "https://overnight-edge.vercel.app"
 
+# Short Squeeze Radar Buy Button ID
+SQR_BUY_BUTTON = "buy_btn_1TWLniGrDuTtAB3mojv83V6D"
+
+# X Bearer for potential X sentiment integration (if needed)
 X_BEARER = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
+
+# Unique voice: tactical, asymmetric, risk-focused
+# Content boundaries: ONLY short interest %, float, days to cover, gamma ramp, borrow utilization, squeeze score
+# NO futures, NO congressional trades, NO prediction markets, NO X sentiment
 
 def send_telegram(text, chat_id=ADMIN_CHAT):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -160,37 +172,11 @@ def fetch_short_squeeze_data():
     return candidates
 
 def generate_alert(candidate, session_label):
-    ticker = candidate["ticker"]
-    score = candidate["squeeze_score"]
-    date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    
-    # Synthesis
-    setup = f"High short interest ({candidate['short_pct']}% of float) combined with {'a gamma ramp in near-dated calls' if candidate['gamma_ramp'] else 'tight float'} creates asymmetric risk. {'Borrow utilization is maxed, meaning shorts are paying premium to maintain positions.' if candidate['borrow_util'] > 90 else 'Social volume is accelerating, suggesting retail attention is building.'}"
-    
-    risk = "A broad market selloff or company-specific negative catalyst could trap longs instead. Short squeezes are high-volatility events with no guaranteed outcome."
-    
-    alert = f"""🚨 <b>SHORT SQUEEZE RADAR — {date_str} {session_label}</b>
-━━━━━━━━━━━━━━━━━━━━
-
-<b>{ticker}: SQUEEZE SCORE {score}/10</b>
-
-📊 <b>SHORT INTEREST:</b> {candidate['short_pct']}% of float
-📈 <b>FLOAT:</b> {candidate['float_m']}M shares
-⏱️ <b>DAYS TO COVER:</b> {candidate['days_to_cover']}
-📊 <b>GAMMA RAMP:</b> {'Yes — ATM call volume spike' if candidate['gamma_ramp'] else 'No significant ramp'}
-📈 <b>PRICE MOMENTUM:</b> {candidate['price_momentum']}
-📢 <b>SOCIAL VOLUME:</b> +{candidate['social_spike']}% vs 30-day avg
-💰 <b>BORROW UTILIZATION:</b> {candidate['borrow_util']}%
-
-<b>SETUP:</b> {setup}
-<b>RISK:</b> {risk}
-
-⚠️ HIGH RISK — NOT FINANCIAL ADVICE"""
-    
-    return alert
+    """Generate alert using redesigned Short Squeeze Radar template"""
+    return generate_squeeze_radar_report([candidate], session_label=session_label)
 
 def post_public_teaser(candidate):
-    """Post a teaser to the public Telegram channel"""
+    """Post a teaser to the public Telegram channel with product-specific CTA"""
     ticker = candidate["ticker"]
     score = candidate["squeeze_score"]
     
@@ -201,10 +187,12 @@ def post_public_teaser(candidate):
 📊 Short Interest: {candidate['short_pct']}% of float
 💰 Borrow Util: {candidate['borrow_util']}%
 
-Full squeeze mechanics + risk breakdown + all data →
-https://overnight-edge.vercel.app
+<b>Get squeeze alerts twice daily →</b>
+<a href="{LANDING_URL}">Short Squeeze Radar — $99/mo</a>
+<b>See all Overnight Edge tiers →</b>
+<a href="{LANDING_URL}">overnight-edge.vercel.app</a>
 
-⚠️ NOT FINANCIAL ADVICE"""
+⚠️ HIGH RISK — NOT FINANCIAL ADVICE"""
     
     send_telegram_photo(LOGO_PATH, teaser, PUBLIC_CHANNEL)
 
