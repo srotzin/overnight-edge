@@ -183,7 +183,7 @@ def send_congressional_alert(trade, is_public=True):
 📅 <b>Filed:</b> {date}
 
 Full analysis + confluence scoring →
-https://overnight-edge.onrender.com"""
+https://overnight-edge.vercel.app"""
         
         sent = send_telegram_photo(LOGO_PATH, caption, PUBLIC_CHANNEL)
         print(f"Public alert for {ticker}: {'OK' if sent else 'FAIL'}")
@@ -252,7 +252,7 @@ def main():
 📅 <b>Filed:</b> {filing['updated'][:10]}
 
 Full analysis + options flow →
-https://overnight-edge.onrender.com"""
+https://overnight-edge.vercel.app"""
             
             send_telegram_photo(LOGO_PATH, caption, PUBLIC_CHANNEL)
             time.sleep(3)

@@ -5,7 +5,7 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 
 DRAFTS_DIR = "/mnt/user/overnight-edge/reddit_drafts"
-LANDING_URL = "https://overnight-edge.onrender.com"
+LANDING_URL = "https://overnight-edge.vercel.app"
 
 def save_reddit_draft(filename, title, body):
     """Save a Reddit-formatted draft to disk"""

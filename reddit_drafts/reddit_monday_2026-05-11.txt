@@ -1,0 +1,20 @@
+TITLE: Overnight Edge — Pre-Market Brief May 11, 2026
+
+I built an AI that sends me a pre-market brief every morning before the market opens. Here's what it found today:
+
+**Futures:** S&P +0.4%, Nasdaq +0.6%
+**VIX:** 14.2 (-0.8)
+
+**Top mover:** AAPL +3.2%
+**Weakest:** META -1.4%
+
+**Earnings to watch:** AAPL (after close), AMD (before open)
+**Economic data:** PPI data due 8:30 AM EST
+
+**Context:** Fed minutes suggest cautious stance. Oil prices steady ahead of OPEC meeting.
+
+**Bottom line:** Tech leading, volatility compressed. Cautiously bullish bias.
+
+I started this because I was tired of reading five different apps before 9:30 AM. Now I get one text with everything that matters. If anyone wants the full thing delivered to Telegram, link in bio.
+
+Not financial advice. Just sharing what my bot found this morning.

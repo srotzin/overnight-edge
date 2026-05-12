@@ -202,7 +202,7 @@ def post_public_teaser(candidate):
 💰 Borrow Util: {candidate['borrow_util']}%
 
 Full squeeze mechanics + risk breakdown + all data →
-https://overnight-edge.onrender.com
+https://overnight-edge.vercel.app
 
 ⚠️ NOT FINANCIAL ADVICE"""
     

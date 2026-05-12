@@ -95,7 +95,7 @@ def generate_public_teaser(ticker, signal_type, score, direction, detail):
 💰 <b>DETAIL:</b> {detail[:80]}...
 
 Full signal + all sources + confluence analysis →
-<a href="https://overnight-edge.onrender.com">overnight-edge.onrender.com</a>"""
+<a href="https://overnight-edge.vercel.app">overnight-edge.vercel.app</a>"""
 
 def generate_full_alert(signal):
     return f"""🚨 <b>SIGNALSYNTHESIZER — {signal['ticker']}</b>

@@ -184,7 +184,7 @@ Systems operational. Building subscriber base and signal history.
 📈 <b>THIS WEEK:</b>
 • Daily briefs delivered: {briefs}
 • Services running: 8/8
-• Landing page: overnight-edge.onrender.com
+• Landing page: overnight-edge.vercel.app
 
 🎯 <b>STATUS:</b>
 • MRR: Building

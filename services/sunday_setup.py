@@ -9,7 +9,7 @@ TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_bot.png"
 DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
-LANDING_URL = "https://overnight-edge.onrender.com"
+LANDING_URL = "https://overnight-edge.vercel.app"
 
 X_BEARER = "AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy"
 X_CLIENT_ID = "RFd5RTctLThrb1o2bFQ5US11cno6MTpjaQ"
@@ -195,7 +195,7 @@ def generate_brief():
 ⚠️ NOT FINANCIAL ADVICE
 
 ━━━━━━━━━━━━━━━━━━━━
-<b>Get real-time alerts all week →</b> overnight-edge.onrender.com"""
+<b>Get real-time alerts all week →</b> overnight-edge.vercel.app"""
     
     return brief, week_of, cal_lines, earn_lines, geo, options, signals, outlook
 

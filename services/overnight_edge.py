@@ -15,7 +15,7 @@ ADMIN_CHAT = "5975342168"
 
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_dark.jpeg"
 DRAFTS_DIR = "/mnt/user/overnight-edge/tradingview_drafts"
-LANDING_URL = "https://overnight-edge.onrender.com"
+LANDING_URL = "https://overnight-edge.vercel.app"
 
 # X API Bearer Token (user provided)
 X_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAALko9gEAAAAAVO21s1OTPi8uVRFse%2FDNOwRqILg%3DWfNO8ZpZnA83KuUo2MBnbf3rD02YmhSMR3Yq0tqBEPgynG9nnS zapH2hsZ64upxIHXjpvBlTAMOd354L7lFdmX2FkeXBIl8MWZDW T82mNIQqtt8efmAdj5nrMjFWc"
@@ -620,7 +620,7 @@ def generate_subscription_footer():
 <a href="https://buy.stripe.com/{STRIPE_PRODUCTS['x20_signal']}">X20 Signal — $449/mo</a>
 <a href="https://buy.stripe.com/{STRIPE_PRODUCTS['prediction_pro']}">Prediction Pro — $499/mo</a>
 
-🔓 <a href="{LANDING_URL}">Full Products → overnight-edge.onrender.com</a>"""
+🔓 <a href="{LANDING_URL}">Full Products → overnight-edge.vercel.app</a>"""
 
 
 def generate_cast_cross_promo():
@@ -698,7 +698,7 @@ Odds: {wildcard['o']} ({wildcard['s']})
 ⚠️ {closing}
 
 Full brief + 10 more signals + earnings calendar →
-<a href="{LANDING_URL}">overnight-edge.onrender.com</a>"""
+<a href="{LANDING_URL}">overnight-edge.vercel.app</a>"""
     
     return preview
 
@@ -777,7 +777,7 @@ def main():
     preview = generate_free_preview(data, headlines)
     if os.path.exists(LOGO_PATH):
         # Send photo with truncated teaser caption, then full text
-        teaser = preview[:900] + "...\n\n📡 Full brief → overnight-edge.onrender.com"
+        teaser = preview[:900] + "...\n\n📡 Full brief → overnight-edge.vercel.app"
         photo_sent = send_telegram_photo(LOGO_PATH, teaser, PUBLIC_CHANNEL)
         if photo_sent:
             # Send full text as follow-up

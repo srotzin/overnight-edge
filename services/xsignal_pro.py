@@ -412,7 +412,7 @@ def main():
 💰 <b>MONITORED:</b> {len(set(m['account'] for m in ticker_mentions))} accounts
 
 Full analysis + all tiers →
-<a href="https://overnight-edge.onrender.com">overnight-edge.onrender.com</a>"""
+<a href="https://overnight-edge.vercel.app">overnight-edge.vercel.app</a>"""
             
             send_telegram_photo(LOGO_PATH, teaser, PUBLIC_CHANNEL)
             time.sleep(2)
