@@ -45,7 +45,7 @@ export default function Home() {
               <li>Breaking news with sentiment</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTd168i0Iw8b3M"
+              href="https://buy.stripe.com/prod_UTd168i0Iw8b3M"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -66,7 +66,7 @@ export default function Home() {
               <li>Confluence scoring 3/5 minimum</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTd2L2yQEam5Cl"
+              href="https://buy.stripe.com/prod_UTd2L2yQEam5Cl"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -87,7 +87,7 @@ export default function Home() {
               <li>Social volume & borrow utilization</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTnEW457mr8e8Y"
+              href="https://buy.stripe.com/prod_UTnEW457mr8e8Y"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -108,7 +108,7 @@ export default function Home() {
               <li>Confluence scoring on keyword matches</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTmCN8WfEm86rk"
+              href="https://buy.stripe.com/prod_UTmCN8WfEm86rk"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -130,7 +130,7 @@ export default function Home() {
               <li>Includes Short Squeeze Radar</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTmCJV925O2pvU"
+              href="https://buy.stripe.com/prod_UTmCJV925O2pvU"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -151,7 +151,7 @@ export default function Home() {
               <li>4x daily reports</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTmghR9ygJVPZb"
+              href="https://buy.stripe.com/prod_UTmghR9ygJVPZb"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -173,7 +173,7 @@ export default function Home() {
               <li>Includes Short Squeeze Radar</li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTmhMhmW6G3r4D"
+              href="https://buy.stripe.com/prod_UTmhMhmW6G3r4D"
               className="block w-full text-center bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Subscribe
@@ -199,7 +199,7 @@ export default function Home() {
               <li><b>Included with every tier</b></li>
             </ul>
             <a
-              href="https://buy.stripe.com/test_prod_UTnDozUig2aYiV"
+              href="https://buy.stripe.com/prod_UTnDozUig2aYiV"
               className="block w-full text-center bg-[#00c853] text-black font-semibold py-3 rounded-lg hover:bg-[#00a844] transition-colors"
             >
               Subscribe to Any Tier

@@ -77,8 +77,10 @@ def fetch_polymarket_data():
         req = urllib.request.Request(url, headers={"User-Agent": "OvernightEdgeBot/1.0"})
         resp = urllib.request.urlopen(req, timeout=30)
         data = json.loads(resp.read())
+        # API returns raw list or dict with markets key
+        markets_raw = data if isinstance(data, list) else data.get("markets", [])
         markets = []
-        for m in data.get("markets", [])[:10]:
+        for m in markets_raw[:10]:
             markets.append({
                 "title": m.get("question", "Unknown"),
                 "probability": m.get("probability", 0.5),
