@@ -7,6 +7,12 @@ from datetime import datetime, timezone
 import sys
 import glob
 
+try:
+    import pandas as pd
+    HAS_PANDAS = True
+except ImportError:
+    HAS_PANDAS = False
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 ADMIN_CHAT = "5975342168"
 
@@ -30,7 +36,6 @@ CAST_STRIPE_SECRET = os.environ.get("CAST_STRIPE_SECRET", "")
 def create_cast_checkout_url(price_id: str) -> str:
     """Create a Stripe Checkout session URL from a Price ID"""
     if not CAST_STRIPE_SECRET:
-        # Fallback: direct payment link format (won't work without secret)
         return f"https://buy.stripe.com/{price_id}"
     try:
         import urllib.request
@@ -65,6 +70,7 @@ def send_telegram(text: str, chat_id: str = ADMIN_CHAT):
         return False
 
 def log_delivery(date_str: str, dtype: str, count: int, status: str):
+    os.makedirs("/mnt/user/castreport", exist_ok=True)
     with open("/mnt/user/castreport/delivery_log.csv", "a", newline="") as f:
         csv.writer(f).writerow([date_str, dtype, count, status])
 
@@ -75,7 +81,91 @@ def get_latest_embed_file():
     latest = max(files, key=os.path.getmtime)
     return latest
 
+def get_previous_embed_file(latest_file):
+    """Get the second most recent embed file for day-over-day comparison"""
+    files = glob.glob("/mnt/user/castreport/embeds/*.xlsx")
+    if len(files) < 2:
+        return None
+    # Sort by modification time, descending
+    files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
+    if files_sorted[0] == latest_file:
+        return files_sorted[1] if len(files_sorted) > 1 else None
+    return files_sorted[0]
+
+def parse_embed_excel(filepath: str) -> dict:
+    """Parse Simpson Strong-Tie embed Excel file directly"""
+    if not HAS_PANDAS:
+        print("Pandas not available, falling back to ingest API")
+        return None
+    try:
+        import pandas as pd
+        df = pd.read_excel(filepath, sheet_name='US Sales BI Report', header=None)
+        
+        # Skip first 2 rows (date row + header row)
+        data = df.iloc[2:].copy()
+        data.columns = ['Shipping_Region', 'Shipping_Country', 'Material', 'Invoice_Amount', 'Material_Category']
+        
+        # Remove header/footer rows
+        data = data[data['Shipping_Region'] != 'Shipping Region']
+        data = data[data['Shipping_Region'].notna()]
+        data = data[data['Material'] != 'Material']
+        
+        # Convert amounts to numeric
+        data['Invoice_Amount'] = pd.to_numeric(data['Invoice_Amount'], errors='coerce')
+        data = data[data['Invoice_Amount'].notna()]
+        
+        # Clean material category
+        data['Material_Category'] = data['Material_Category'].fillna(data['Material'].apply(
+            lambda x: 'STHD' if str(x).startswith('STHD') else 
+                      'SSTB' if str(x).startswith('SSTB') else
+                      'MASA' if str(x).startswith('MASA') else 'OTHER'
+        ))
+        
+        # Aggregate by state and category
+        state_data = []
+        for state in sorted(data['Shipping_Region'].unique()):
+            state_df = data[data['Shipping_Region'] == state]
+            sthd = state_df[state_df['Material_Category'] == 'STHD']['Invoice_Amount'].sum()
+            sstb = state_df[state_df['Material_Category'] == 'SSTB']['Invoice_Amount'].sum()
+            masa = state_df[state_df['Material_Category'] == 'MASA']['Invoice_Amount'].sum()
+            total = state_df['Invoice_Amount'].sum()
+            count = len(state_df)
+            
+            state_data.append({
+                "state": state,
+                "sthd": round(float(sthd), 2),
+                "sstb": round(float(sstb), 2),
+                "masa": round(float(masa), 2),
+                "total": round(float(total), 2),
+                "count": int(count),
+            })
+        
+        total_amount = float(data['Invoice_Amount'].sum())
+        total_count = len(data)
+        
+        return {
+            "states": state_data,
+            "summary": {
+                "total_amount": round(total_amount, 2),
+                "total_count": total_count,
+                "total_states": len(state_data),
+                "sthd_total": round(float(data[data['Material_Category'] == 'STHD']['Invoice_Amount'].sum()), 2),
+                "sstb_total": round(float(data[data['Material_Category'] == 'SSTB']['Invoice_Amount'].sum()), 2),
+                "masa_total": round(float(data[data['Material_Category'] == 'MASA']['Invoice_Amount'].sum()), 2),
+            }
+        }
+    except Exception as e:
+        print(f"Direct parse failed: {e}")
+        return None
+
 def ingest_embeds(filepath: str) -> dict:
+    # First try direct parsing
+    direct_data = parse_embed_excel(filepath)
+    if direct_data:
+        print(f"Direct parse successful: {direct_data['summary']['total_amount']}")
+        return {"success": True, "data": direct_data}
+    
+    # Fallback to API
     try:
         with open(filepath, "rb") as f:
             file_data = f.read()
@@ -98,16 +188,29 @@ def ingest_embeds(filepath: str) -> dict:
         print(f"Ingest failed: {e}")
         return {"success": False, "error": str(e)}
 
-def analyze_data(data: dict) -> dict:
+def analyze_data(data: dict, previous_data: dict = None) -> dict:
     anomalies = []
     state_summary = []
-    states = data.get("data", {}).get("states", [])
+    states = data.get("states", [])
+    
+    # Build previous day lookup if available
+    prev_lookup = {}
+    if previous_data and "states" in previous_data:
+        for s in previous_data["states"]:
+            prev_lookup[s.get("state", "")] = s.get("total", 0)
+    
     for state in states:
         name = state.get("state", "Unknown")
         sthd = state.get("sthd", 0)
         sstb = state.get("sstb", 0)
         masa = state.get("masa", 0)
-        change = state.get("day_over_day_change", 0)
+        total = state.get("total", 0)
+        
+        # Calculate day-over-day change if previous data exists
+        change = 0
+        if name in prev_lookup and prev_lookup[name] > 0:
+            change = (total - prev_lookup[name]) / prev_lookup[name]
+        
         if abs(change) > 0.5:
             direction = "📈 SURGE" if change > 0 else "📉 DROP"
             anomalies.append({
@@ -117,21 +220,33 @@ def analyze_data(data: dict) -> dict:
                 "sthd": sthd,
                 "sstb": sstb,
                 "masa": masa,
+                "total": total,
             })
+        
         state_summary.append({
             "state": name,
-            "total": sthd + sstb + masa,
+            "total": total,
+            "sthd": sthd,
+            "sstb": sstb,
+            "masa": masa,
         })
+    
     top_states = sorted(state_summary, key=lambda x: x["total"], reverse=True)[:5]
+    
+    summary = data.get("summary", {})
+    
     return {
         "anomalies": anomalies,
         "top_states": top_states,
         "total_states": len(states),
+        "total_amount": summary.get("total_amount", 0),
+        "total_count": summary.get("total_count", 0),
+        "sthd_total": summary.get("sthd_total", 0),
+        "sstb_total": summary.get("sstb_total", 0),
+        "masa_total": summary.get("masa_total", 0),
     }
 
 def generate_subscription_footer():
-    # TODO: Replace with actual Stripe Payment Link URLs once created in dashboard
-    # Price IDs are backend identifiers, not clickable URLs
     return f"""━━━━━━━━━━━━━━━━━━━━
 🏗️ <b>SUBSCRIBE TO CAST REPORT</b>
 
@@ -140,19 +255,30 @@ def generate_subscription_footer():
 def generate_cast_alert(analysis: dict) -> str:
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
+    
     if analysis["anomalies"]:
-        anomaly_lines = [f"{a['direction']} <b>{a['state']}</b>: {a['change']}" for a in analysis["anomalies"]]
+        anomaly_lines = [f"{a['direction']} <b>{a['state']}</b>: {a['change']} (${a['total']:,.0f})" for a in analysis["anomalies"]]
         anomaly_text = "\n".join(anomaly_lines)
     else:
-        anomaly_text = "No anomalies detected."
-    top_states_text = "\n".join([f"• <b>{s['state']}</b>: {s['total']:,} embeds" for s in analysis["top_states"]])
+        anomaly_text = "No significant day-over-day changes detected."
+    
+    top_states_text = "\n".join([f"• <b>{s['state']}</b>: ${s['total']:,.0f} (STHD ${s['sthd']:,.0f}, SSTB ${s['sstb']:,.0f}, MASA ${s['masa']:,.0f})" for s in analysis["top_states"]])
+    
     subscription = generate_subscription_footer()
+    
     return f"""🏗️ <b>CAST REPORT — {date_str}</b>
 ━━━━━━━━━━━━━━━━━━━━
 📊 <b>DAILY EMBED INTELLIGENCE</b>
 States tracked: {analysis['total_states']}
+Total volume: ${analysis['total_amount']:,.0f}
+Total embeds: {analysis['total_count']:,}
 
-🚨 <b>ANOMALIES</b>
+📦 <b>BY MATERIAL:</b>
+• STHD: ${analysis['sthd_total']:,.0f}
+• SSTB: ${analysis['sstb_total']:,.0f}
+• MASA: ${analysis['masa_total']:,.0f}
+
+🚨 <b>ANOMALIES (>50% day-over-day)</b>
 {anomaly_text}
 
 🏆 <b>TOP STATES</b>
@@ -179,6 +305,7 @@ The alert will auto-resend when data becomes available.
 def main():
     now = datetime.now(timezone.utc)
     date_str = now.strftime("%Y-%m-%d")
+    
     embed_file = get_latest_embed_file()
     if not embed_file:
         notice = generate_delayed_notice()
@@ -186,7 +313,18 @@ def main():
         log_delivery(date_str, "delayed_notice", 1, "delivered" if sent else "failed")
         print(f"Data delayed notice sent: {'OK' if sent else 'FAIL'}")
         return
+    
     print(f"Found embed file: {embed_file}")
+    
+    # Get previous file for comparison
+    prev_file = get_previous_embed_file(embed_file)
+    previous_data = None
+    if prev_file:
+        print(f"Previous file for comparison: {prev_file}")
+        prev_result = ingest_embeds(prev_file)
+        if prev_result["success"]:
+            previous_data = prev_result["data"]
+    
     result = ingest_embeds(embed_file)
     if not result["success"]:
         error_msg = f"CAST ingest failed: {result.get('error', 'Unknown error')}"
@@ -194,11 +332,13 @@ def main():
         send_telegram(f"⚠️ <b>CAST SYSTEM ALERT</b>\n{error_msg}")
         log_delivery(date_str, "ingest", 0, "failed")
         return
-    analysis = analyze_data(result["data"])
+    
+    analysis = analyze_data(result["data"], previous_data)
     alert = generate_cast_alert(analysis)
     sent = send_telegram(alert)
     log_delivery(date_str, "daily_alert", 1, "delivered" if sent else "failed")
     print(f"CAST alert sent: {'OK' if sent else 'FAIL'}")
+    
     if analysis["anomalies"]:
         highlight = f"""🚨 <b>CAST ANOMALY ALERT</b>
 ━━━━━━━━━━━━━━━━━━━━
