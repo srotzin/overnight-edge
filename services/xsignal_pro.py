@@ -6,10 +6,22 @@ import urllib.parse
 from datetime import datetime, timezone, timedelta
 import time
 
+# Import redesigned template
+from xsignal_redesign import generate_xsignal_report, get_xsignal_footer, signal_to_emoji, keyword_confluence_line
+
 TELEGRAM_TOKEN = "8640911773:AAEYcQpVsU1eOVKRZaWkJ35K04c5nY8Pvsk"
 PUBLIC_CHANNEL = "-1003828989254"
 ADMIN_CHAT = "5975342168"
 LOGO_PATH = "/mnt/user/overnight-edge/public/cartoons/overnight_logo_dark.jpeg"
+LANDING_URL = "https://overnight-edge.vercel.app"
+
+# X20 Signal Buy Button ID
+X20_BUY_BUTTON = "buy_btn_1TWLqAGrDuTtAB3mBu2MrOMW"
+
+# Unique voice: full-spectrum authority, institutional, cross-asset
+# Content boundaries: X/Twitter signals + ALL other data streams (futures, congressional, squeeze, predictions)
+# Bundles Short Squeeze Radar. 15-min cadence. The everything-tier.
+# Drives to X20 Signal specifically AND landing page
 
 TWITTER_BEARER = urllib.parse.unquote("AAAAAAAAAAAAAAAAAAAAAGFz9QEAAAAAjyzUpPC%2B2jvK6SwRXHFjtpDu3pk%3DhUBulTxX7eRF9rfTKDQcP6z0acMTEtkWv7NnIqZtI7zJxlIcxy")
 
